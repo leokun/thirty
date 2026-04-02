@@ -1,5 +1,5 @@
 {
-  "extends": "../../packages/config-typescript/react.json",
+  "extends": "@thirty/config-typescript/react",
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src"
