@@ -338,7 +338,9 @@ model SuggestionRule {
 
 model SuggestionDismissal {
   id               String   @id @default(cuid())
-  userId           String   // FK vers user Better Auth
+  // FK to Better Auth user table (not managed by Prisma, no @relation possible).
+  // Referential integrity enforced at application level.
+  userId           String
   suggestionRuleId String
   dismissedAt      DateTime @default(now())
 
@@ -356,7 +358,9 @@ model SuggestionDismissal {
 
 model FavoriteMeal {
   id            String     @id @default(cuid())
-  userId        String     // FK vers user Better Auth
+  // FK to Better Auth user table (not managed by Prisma, no @relation possible).
+  // Referential integrity enforced at application level.
+  userId        String
   name          String     // "Mon petit-déj habituel"
   moment        MealMoment?
   

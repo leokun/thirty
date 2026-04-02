@@ -2,10 +2,10 @@
 // Use case : calculer la diversité hebdomadaire
 // =============================================================================
 
-import type { Trend } from '@thirty/shared';
 import type { RollingWindowData } from '../value-objects/rolling-window.vo.js';
 import type { WeeklyDiversityResult } from '../value-objects/weekly-diversity-result.vo.js';
 import { countDistinct, uniqueFoodIds, flattenFoodLogs } from '../services/rolling-window.service.js';
+import { computeTrend } from '../../shared/services/compute-trend.service.js';
 
 /**
  * Calcule le snapshot de diversité pour une fenêtre glissante.
@@ -27,20 +27,7 @@ export function computeWeeklyDiversity(
     rollingTotalFoodCount,
     uniquePlantIds: plantIds,
     uniquePlantNames,
-    trend: computeDiversityTrend(rollingPlantCount, previousPlantCount),
+    trend: computeTrend(rollingPlantCount, previousPlantCount, 3),
   };
 }
 
-/**
- * Détermine la tendance : +3 = IMPROVING, -3 = DECLINING, sinon STABLE.
- */
-export function computeDiversityTrend(
-  currentCount: number,
-  previousCount?: number,
-): Trend {
-  if (previousCount === undefined) return 'STABLE';
-  const delta = currentCount - previousCount;
-  if (delta >= 3) return 'IMPROVING';
-  if (delta <= -3) return 'DECLINING';
-  return 'STABLE';
-}

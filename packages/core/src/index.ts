@@ -8,6 +8,7 @@
 // =============================================================================
 
 // --- Domaines ---
+export * from './domains/shared/index.js';
 export * from './domains/scoring/index.js';
 export * from './domains/journal/index.js';
 export * from './domains/diversity/index.js';

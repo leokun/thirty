@@ -19,4 +19,4 @@ export {
 } from './services/rolling-window.service.js';
 
 // --- Use Cases ---
-export { computeWeeklyDiversity, computeDiversityTrend } from './use-cases/compute-weekly-diversity.use-case.js';
+export { computeWeeklyDiversity } from './use-cases/compute-weekly-diversity.use-case.js';

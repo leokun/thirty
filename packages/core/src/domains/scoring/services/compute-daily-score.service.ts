@@ -4,8 +4,9 @@
 // 6 axes pondérés, ADR-002 (règles métier explicites)
 // =============================================================================
 
-import { SCORING_WEIGHTS, type Trend } from '@thirty/shared';
+import { SCORING_WEIGHTS } from '@thirty/shared';
 import type { DailyScoreBreakdown } from '../../journal/value-objects/daily-score-breakdown.vo.js';
+import { computeTrend } from '../../shared/services/compute-trend.service.js';
 
 export interface DailyScoreInput {
   readonly diversityScore: number;
@@ -29,7 +30,7 @@ export function computeDailyScore(input: DailyScoreInput): DailyScoreBreakdown {
     input.preparationScore * SCORING_WEIGHTS.preparation,
   );
 
-  const trend = computeTrend(totalScore, input.previousScore);
+  const trend = computeTrend(totalScore, input.previousScore, 3);
 
   return {
     totalScore,
@@ -45,10 +46,3 @@ export function computeDailyScore(input: DailyScoreInput): DailyScoreBreakdown {
   };
 }
 
-function computeTrend(current: number, previous?: number): Trend {
-  if (previous === undefined) return 'STABLE';
-  const delta = current - previous;
-  if (delta > 3) return 'IMPROVING';
-  if (delta < -3) return 'DECLINING';
-  return 'STABLE';
-}

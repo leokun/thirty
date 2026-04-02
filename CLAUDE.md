@@ -24,7 +24,7 @@ tout en scorant l'ensemble de son alimentation (y compris non-végétale) sur so
 ```
 apps/web        → React PWA mobile-first
 apps/api        → NestJS API
-packages/shared → Enums, constantes, DTOs techniques (@thirty/shared)
+packages/shared → Enums, constantes partagées (@thirty/shared)
 packages/core   → Logique métier, clean archi DDD (@thirty/core)
 packages/food-db → Base d'aliments curatée, seed data (@thirty/food-db)
 ```
