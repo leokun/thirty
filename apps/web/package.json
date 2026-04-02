@@ -1,0 +1,15 @@
+{
+  "name": "@thirty/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Thirty — React PWA mobile-first",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "lint": "biome check .",
+    "check": "tsc --noEmit",
+    "test": "vitest"
+  }
+}

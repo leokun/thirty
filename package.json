@@ -1,0 +1,22 @@
+{
+  "name": "thirty",
+  "private": true,
+  "description": "Tracker alimentaire centré microbiote intestinal",
+  "packageManager": "pnpm@11.0.0-beta.6",
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "check": "turbo run check",
+    "test": "turbo run test",
+    "format": "biome format --write .",
+    "db:generate": "turbo run db:generate --filter=@thirty/api",
+    "db:push": "turbo run db:push --filter=@thirty/api",
+    "db:migrate": "turbo run db:migrate --filter=@thirty/api",
+    "db:seed": "turbo run db:seed --filter=@thirty/api"
+  }
+}
