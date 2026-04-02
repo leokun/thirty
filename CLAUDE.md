@@ -39,6 +39,7 @@ packages/food-db → Base d'aliments curatée, seed data (@thirty/food-db)
 - **Scoring** : règles métier explicites, pas de ML (ADR-002). Le moteur de scoring vit dans `@thirty/core/domains/scoring`, pur TS, testable isolément.
 - **Tests** : colocalisés (`*.test.ts` à côté du fichier testé). Scope unitaire strict : un test de use-case mock les repositories via les implémentations in-memory, un test de service ne teste que sa logique pure.
 - **Base aliments** : curatée manuellement (300-500 aliments), qualité > quantité (ADR-003)
+- **Commits** : toujours suivre les conventions gitmoji du skill `/standards` avant de commiter. Format : `<gitmoji> [<domain>] <imperative summary>`
 
 ## Domaine métier
 

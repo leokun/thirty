@@ -39,10 +39,25 @@ Rules:
 
 Format:
 ```
-<gitmoji> <imperative summary> (max 72 chars)
+<gitmoji> [<domain>] <imperative summary> (max 72 chars)
 
 <optional body: explain WHY, not WHAT>
 ```
+
+The `[domain]` scope is **required** and refers to the domain touched:
+
+| Domain       | Scope                                      |
+|--------------|--------------------------------------------|
+| `scoring`    | Microbiome scoring engine (6 axes)         |
+| `journal`    | Meal entries, food logs, daily aggregation |
+| `diversity`  | 30-plant counter, rolling window           |
+| `suggestion` | Contextual suggestions engine              |
+| `shared`     | Shared enums, constants                    |
+| `food-db`    | Curated food database, seed data           |
+| `auth`       | Authentication, sessions, user profiles    |
+| `infra`      | Config, tooling, CI/CD, monorepo setup     |
+| `docs`       | Documentation, ADRs, CLAUDE.md             |
+| `ui`         | Frontend components, styling, PWA          |
 
 | Gitmoji | Code                      | When                                  |
 |---------|---------------------------|---------------------------------------|
@@ -64,24 +79,29 @@ Format:
 
 Examples:
 ```
-✨ Add food search with fuzzy matching
+✨ [diversity] Add rolling window plant counter
 
-Implements Fuse.js-based search in @thirty/web.
-Debounced input with 300ms delay.
+Tracks unique plants over a 7-day sliding window (ADR-004).
 ```
 ```
-♻️ Extract scoring axes into individual services
+♻️ [scoring] Extract per-axis computation services
 
 Split monolithic computeDailyScore into per-axis functions
 for testability (ADR-002 compliance).
 ```
 ```
-🗃️ Add FavoriteMeal model to Prisma schema
+🗃️ [journal] Add FavoriteMeal model to Prisma schema
+```
+```
+🔧 [infra] Add shared TypeScript configs
+```
+```
+📝 [docs] Add CLAUDE.md for all packages
 ```
 
 ### PR Conventions
 
-- Title: same format as commit (gitmoji + imperative summary)
+- Title: same format as commit (`<gitmoji> [<domain>] <imperative summary>`)
 - Body must include:
   - **What**: 1-3 bullet points
   - **Why**: context / ADR reference if applicable
