@@ -1,9 +1,10 @@
 {
-  "extends": "../../packages/config-typescript/nestjs.json",
+  "extends": "@thirty/config-typescript/nestjs",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "types": ["node"]
   },
   "include": ["src"],
-  "exclude": ["node_modules", "dist", "src/generated"]
+  "exclude": ["node_modules", "dist", "src/generated", "src/prisma-client.ts"]
 }
