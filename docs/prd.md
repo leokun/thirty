@@ -242,7 +242,7 @@ Score composite sur 100, calculé à partir de **toute l'alimentation** :
 | **Frontend** | React + Vite + TailwindCSS | React 19.2.x, Vite 8.0.x, Tailwind 4.2.x | React 19 (Server Components, hooks `use`), Vite 8 (Rolldown, plus d'esbuild), Tailwind 4 (CSS-first, plugin Vite natif) |
 | **Frontend libs** | TanStack (Query, Router, Form, Table, Virtual) | latest | Écosystème cohérent, type-safe, couvre data fetching → routing → formulaires |
 | **PWA** | Workbox (service worker) + manifest | latest | Offline-first pour le journal, installable |
-| **Backend** | NestJS | 11.x → 12 dès la beta (Q3 2026) | Clean Architecture, TS, migration ESM en v12. Packages purs (`@thirty/core`, `@thirty/food-db`) en ESM dès le jour 1 |
+| **Backend** | NestJS | 11.x → 12 dès la beta (Q3 2026) | Clean Architecture, TS, migration ESM en v12. Packages purs (`@thirty/core`, `@thirty/db`, `@thirty/shared`) en ESM dès le jour 1 |
 | **Base de données** | PostgreSQL | 17.x | Données relationnelles, requêtes analytiques natives (ADR-001) |
 | **ORM** | Prisma | 7.4.x | Rust-free, ESM, driver adapters, type-safe (ADR-001) |
 | **Auth** | Better Auth (`@thallesp/nestjs-better-auth`) | latest | Self-hosted, solution complète, données chez soi (ADR-006) |
@@ -272,11 +272,11 @@ Principe : utiliser au maximum l'écosystème TanStack selon les besoins, pour b
 thirty/
 ├── apps/
 │   ├── web/          # React PWA (mobile-first)
-│   └── api/          # NestJS API
+│   └── api/          # NestJS API (pur HTTP adapter)
 ├── packages/
-│   ├── shared/       # Enums, constantes, DTOs techniques
-│   ├── core/         # Logique métier, clean archi DDD (scoring, journal, diversity, suggestion)
-│   └── food-db/      # Base de données aliments (seed data, parsers, validateurs)
+│   ├── shared/       # Types, interfaces, DTOs, validators Zod, enums, constantes
+│   ├── db/           # Schema Prisma, client, migrations, seed data (ex food-db + api/prisma)
+│   ├── core/         # Logique métier, use cases, ports, adapters Prisma (scoring, journal, diversity, suggestion, food, favorite)
 ├── docs/
 │   ├── prd.md        # Ce document
 │   ├── adr/          # Architecture Decision Records
@@ -296,6 +296,7 @@ thirty/
 - **ADR-006** : Better Auth vs Passport.js — pragmatisme et souveraineté des données ✅
 - **ADR-007** : Coolify sur VPS Hetzner vs Fly.io vs VPS nu — coût/contrôle/DX ✅
 - **ADR-008** : Fusion de @thirty/scoring dans @thirty/core, clean architecture DDD par domaine ✅
+- **ADR-009** : Types dans shared, adapters dans core, package @thirty/db - réorganisation des couches pour F1 ✅
 
 ---
 

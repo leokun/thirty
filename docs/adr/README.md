@@ -13,6 +13,7 @@ Chaque décision est argumentée avec les options évaluées, la décision prise
 | [006](./adr_006.md) | Better Auth vs Passport.js | ✅ Accepté |
 | [007](./adr_007.md) | Coolify sur VPS Hetzner vs Fly.io vs VPS nu | ✅ Accepté |
 | [008](./adr_008.md) | @thirty/core — clean architecture DDD par domaine | ✅ Accepté |
+| [009](./adr_009.md) | Types dans shared, adapters dans core, package @thirty/db | ✅ Accepté |
 
 ## Format
 

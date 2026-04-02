@@ -53,7 +53,9 @@ The `[domain]` scope is **required** and refers to the domain touched:
 | `diversity`  | 30-plant counter, rolling window           |
 | `suggestion` | Contextual suggestions engine              |
 | `shared`     | Shared enums, constants                    |
-| `food-db`    | Curated food database, seed data           |
+| `db`         | Prisma schema, client, migrations, seed data |
+| `food`       | Food search, recent foods, user foods      |
+| `favorite`   | Favorite meals management                  |
 | `auth`       | Authentication, sessions, user profiles    |
 | `infra`      | Config, tooling, CI/CD, monorepo setup     |
 | `docs`       | Documentation, ADRs, CLAUDE.md             |

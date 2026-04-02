@@ -1,6 +1,6 @@
 ---
 name: clean-archi
-description: Clean Architecture DDD patterns for @thirty/core - entities, VOs, services, use cases, ports & adapters
+description: Clean Architecture DDD patterns for @thirty/core - use cases, services, ports & adapters
 license: MIT
 metadata:
   author: thirty
@@ -14,110 +14,60 @@ Architecture rules for `@thirty/core` and how it connects to `apps/api` and `app
 ## Package Dependency Rules
 
 ```
-@thirty/shared  <-  @thirty/core  <-  @thirty/api
-                                   <-  @thirty/web
-@thirty/food-db <-  @thirty/api (seed only)
+@thirty/shared  <-  @thirty/db    <-  @thirty/core  <-  @thirty/api
+                <-  @thirty/web                      <-  @thirty/web (via shared only)
 ```
 
-| From             | Can import                                               | Cannot import           |
-|------------------|----------------------------------------------------------|-------------------------|
-| `@thirty/shared` | Nothing (leaf package)                                   | core, api, web, food-db |
-| `@thirty/core`   | `@thirty/shared`                                         | api, web, food-db       |
-| `@thirty/api`    | `@thirty/shared`, `@thirty/core`, `@thirty/food-db`      | web                     |
-| `@thirty/web`    | `@thirty/shared`, `@thirty/core` (types only)            | api, food-db            |
+| From             | Can import                                               | Cannot import       |
+|------------------|----------------------------------------------------------|---------------------|
+| `@thirty/shared` | Nothing (leaf package)                                   | db, core, api, web  |
+| `@thirty/db`     | `@thirty/shared`                                         | core, api, web      |
+| `@thirty/core`   | `@thirty/shared`, `@thirty/db`                           | api, web            |
+| `@thirty/api`    | `@thirty/core` (transitively gets shared + db)           | web                 |
+| `@thirty/web`    | `@thirty/shared`                                         | db, core, api       |
 
-Critical rule: `@thirty/core` NEVER imports from `@thirty/api` or any framework. It is pure TypeScript with zero runtime dependencies beyond `@thirty/shared`.
+Critical rule: `@thirty/core` NEVER imports from `@thirty/api` or any web framework. It depends on `@thirty/shared` (types) and `@thirty/db` (Prisma client for infrastructure adapters).
 
 ## Domain Structure
 
-Four domains in `packages/core/src/domains/`:
+Six domains in `packages/core/src/domains/`:
 
 ```
 domains/
 ├── scoring/        # Microbiome scoring engine (6 axes)
 │   ├── constants/
-│   ├── services/
-│   └── value-objects/
+│   └── services/
 ├── journal/        # Food logging, daily scoring orchestration
-│   ├── entities/
 │   ├── repositories/
-│   ├── use-cases/
-│   └── value-objects/
+│   └── use-cases/
 ├── diversity/      # Rolling window, plant counting
 │   ├── repositories/
 │   ├── services/
-│   ├── use-cases/
-│   └── value-objects/
-└── suggestion/     # Contextual suggestions engine
-    ├── entities/
+│   └── use-cases/
+├── suggestion/     # Contextual suggestions engine
+│   ├── repositories/
+│   ├── services/
+│   └── use-cases/
+├── food/           # Food search, recent foods, user-created foods
+│   ├── repositories/
+│   └── use-cases/
+└── favorite/       # Favorite meals management
     ├── repositories/
-    ├── services/
-    ├── use-cases/
-    └── value-objects/
+    └── use-cases/
 ```
 
 Not every domain has every folder. Only create what is needed:
-- `scoring` has no entities or repositories (pure computation)
+- `scoring` has no repositories (pure computation)
 - `journal` has no services (use cases orchestrate directly)
 
 ## Building Blocks
 
-### Value Object (.vo.ts)
+### Types & Interfaces
 
-Immutable data structure. No identity, no behavior. All `readonly`.
-
+All domain types and interfaces (previously VOs and entities) live in `@thirty/shared`, not in domain folders. Import them:
 ```typescript
-// domains/scoring/value-objects/computed-food-score.vo.ts
-
-export interface ComputedFoodScore {
-  readonly fiber: number;
-  readonly prebiotic: number;
-  readonly polyphenol: number;
-  readonly probiotics: number;
-  readonly omega3: number;
-  readonly mucosal: number;
-  readonly bonus: number;
-}
-```
-
-When a VO references types from another domain, import them explicitly:
-```typescript
-import type { DailyScoreBreakdown } from '../../journal/value-objects/daily-score-breakdown.vo.js';
-```
-
-When a VO uses shared enums:
-```typescript
-import type { FoodCategory, PreparationMethod } from '@thirty/shared';
-```
-
-### Entity (.entity.ts)
-
-Has an `id` field. Represents a domain concept with identity. Still an interface (not a class).
-
-```typescript
-// domains/journal/entities/food-log.entity.ts
-
-import type { FoodCategory, PortionSize, PreparationMethod } from '@thirty/shared';
-import type { MicrobiomeProfile } from '../../scoring/value-objects/microbiome-profile.vo.js';
-
-export interface FoodLogEntry {
-  readonly id: string;
-  readonly foodId: string;
-  readonly foodName: string;
-  readonly category: FoodCategory;
-  readonly isPlant: boolean;
-  readonly preparationMethod: PreparationMethod;
-  readonly portionSize: PortionSize | null;
-  readonly baseProfile: MicrobiomeProfile;
-  readonly customModifier?: {
-    readonly fiberFactor: number;
-    readonly prebioticFactor: number;
-    readonly polyphenolFactor: number;
-    readonly probioticsFactor: number;
-    readonly microbiomeBonus: number;
-    readonly overrideProfile?: Partial<MicrobiomeProfile>;
-  };
-}
+import type { MicrobiomeProfile, ComputedFoodScore } from '@thirty/shared';
+import type { FoodLogEntry, DayData } from '@thirty/shared';
 ```
 
 ### Service (.service.ts)
@@ -141,48 +91,29 @@ One file can export multiple related functions. Group by cohesion (e.g., `rollin
 
 ### Use Case (.use-case.ts)
 
-Orchestrates services and entities. Can depend on repository interfaces (ports) but never on implementations.
+Orchestrates services and repositories. Use cases are classes with ports injected via the constructor. They never depend on implementations directly.
 
-Synchronous use case (no I/O):
 ```typescript
-// domains/journal/use-cases/score-food-log.use-case.ts
+// domains/journal/use-cases/add-food-log.use-case.ts
 
-import type { FoodLogEntry } from '../entities/food-log.entity.js';
-import type { ScoredFoodLog } from '../value-objects/scored-food-log.vo.js';
-import { applyPreparationModifier } from '../../scoring/services/apply-preparation-modifier.service.js';
-import { PREPARATION_DEFAULTS } from '../../scoring/constants/preparation-defaults.js';
+import type { FoodLogRepository } from '../repositories/food-log.repository.js';
+import type { DailyScoreRepository } from '../repositories/daily-score.repository.js';
+import type { AddFoodLogInput } from '@thirty/shared';
 
-export function scoreFoodLog(entry: FoodLogEntry): ScoredFoodLog {
-  const modifier = entry.customModifier
-    ? { method: entry.preparationMethod, ...entry.customModifier }
-    : { method: entry.preparationMethod, ...PREPARATION_DEFAULTS[entry.preparationMethod] };
+export class AddFoodLogUseCase {
+  constructor(
+    private foodLogRepo: FoodLogRepository,
+    private dailyScoreRepo: DailyScoreRepository,
+  ) {}
 
-  const score = applyPreparationModifier(entry.baseProfile, modifier);
-
-  return {
-    foodLogId: entry.id,
-    foodId: entry.foodId,
-    foodName: entry.foodName,
-    category: entry.category,
-    isPlant: entry.isPlant,
-    preparationMethod: entry.preparationMethod,
-    score,
-  };
+  async execute(mealId: string, input: AddFoodLogInput): Promise<void> {
+    await this.foodLogRepo.addFoodLog(mealId, input);
+    // recompute score...
+  }
 }
 ```
 
-Use case with input interface:
-```typescript
-export interface ScoreDayInput {
-  readonly today: DayData;
-  readonly rollingWindow: RollingWindowData;
-  readonly previousDayScore?: number;
-}
-
-export function scoreDay(input: ScoreDayInput): DailyScoreBreakdown {
-  // orchestration logic
-}
-```
+Pure service functions (`scoreDay`, `scoreFoodLog`) are preserved as internal services called by use case classes.
 
 ### Repository Interface - Port (.repository.ts)
 
@@ -191,28 +122,30 @@ Defines the contract. Lives in the domain. Always an interface, never a class.
 ```typescript
 // domains/journal/repositories/food-log.repository.ts
 
-import type { DayData } from '../value-objects/day-data.vo.js';
+import type { DayData, AddFoodLogInput } from '@thirty/shared';
 
 export interface FoodLogRepository {
   getDayData(userId: string, date: string): Promise<DayData>;
   getRollingWindowData(userId: string, referenceDate: string): Promise<DayData[]>;
+  addFoodLog(mealId: string, input: AddFoodLogInput): Promise<void>;
 }
 ```
 
 Rules:
-- Methods return domain types (VOs, entities), never Prisma types
+- Methods return domain types (from `@thirty/shared`), never Prisma types
+- Ports include both read and write methods as needed by use cases
 - Always `Promise`-based (even if in-memory impl is sync)
 - Keep the interface minimal: only methods the use cases actually need
 
 ### In-Memory Repository - Test Adapter
 
-Lives in `packages/core/src/infrastructure/repositories/`.
+Lives in `packages/core/src/infrastructure/<domain>/`, organized by domain.
 
 ```typescript
-// infrastructure/repositories/in-memory-food-log.repository.ts
+// infrastructure/journal/in-memory-food-log.repository.ts
 
 import type { FoodLogRepository } from '../../domains/journal/repositories/food-log.repository.js';
-import type { DayData } from '../../domains/journal/value-objects/day-data.vo.js';
+import type { DayData, AddFoodLogInput } from '@thirty/shared';
 
 export class InMemoryFoodLogRepository implements FoodLogRepository {
   private days = new Map<string, DayData>();
@@ -224,6 +157,10 @@ export class InMemoryFoodLogRepository implements FoodLogRepository {
 
   async getRollingWindowData(userId: string, referenceDate: string): Promise<DayData[]> {
     // filter logic
+  }
+
+  async addFoodLog(mealId: string, input: AddFoodLogInput): Promise<void> {
+    // in-memory write logic
   }
 
   // Test helpers (not in the interface)
@@ -246,14 +183,14 @@ Pattern:
 
 ### Prisma Repository - Production Adapter
 
-Lives in `apps/api/src/`. Implements the same port using Prisma.
+Lives in `packages/core/src/infrastructure/<domain>/`, organized by domain. Implements the same port using Prisma.
 
 ```typescript
-// apps/api/src/repositories/prisma-food-log.repository.ts
+// packages/core/src/infrastructure/journal/prisma-food-log.repository.ts
 
-import type { FoodLogRepository } from '@thirty/core';
-import type { DayData } from '@thirty/core';
-import { prisma } from '../prisma-client.js';
+import type { FoodLogRepository } from '../../domains/journal/repositories/food-log.repository.js';
+import type { DayData } from '@thirty/shared';
+import { prisma } from '@thirty/db';
 
 export class PrismaFoodLogRepository implements FoodLogRepository {
   async getDayData(userId: string, date: string): Promise<DayData> {
@@ -267,9 +204,10 @@ export class PrismaFoodLogRepository implements FoodLogRepository {
 ```
 
 Rules:
-- Prisma types NEVER leak into core domain code
-- Mapping from Prisma model to domain VO/entity happens here
-- Import domain types from `@thirty/core`
+- Prisma types NEVER leak into domain code
+- Mapping from Prisma model to domain types happens here
+- Import domain types from `@thirty/shared`
+- Import Prisma client from `@thirty/db`
 
 ## Domain Index File Pattern
 
@@ -278,16 +216,23 @@ Each domain has an `index.ts` that re-exports its public API:
 ```typescript
 // domains/scoring/index.ts
 
-// --- Value Objects ---
-export type { ComputedFoodScore } from './value-objects/computed-food-score.vo.js';
-export type { MicrobiomeProfile } from './value-objects/microbiome-profile.vo.js';
-
 // --- Services ---
 export { computeDailyScore } from './services/compute-daily-score.service.js';
 export type { DailyScoreInput } from './services/compute-daily-score.service.js';
 
 // --- Constants ---
 export { PREPARATION_DEFAULTS } from './constants/preparation-defaults.js';
+```
+
+```typescript
+// domains/journal/index.ts
+
+// --- Use Cases ---
+export { AddFoodLogUseCase } from './use-cases/add-food-log.use-case.js';
+
+// --- Repositories (ports) ---
+export type { FoodLogRepository } from './repositories/food-log.repository.js';
+export type { DailyScoreRepository } from './repositories/daily-score.repository.js';
 ```
 
 Rules:
@@ -301,10 +246,12 @@ Rules:
 Domains CAN import from each other within core. Dependency direction:
 
 ```
-scoring  <-  journal     (journal uses scoring services)
-diversity <-  journal    (journal uses diversity counting)
-journal  <-  suggestion  (suggestion reads journal breakdown)
-diversity <-  suggestion (suggestion reads diversity result)
+scoring   <-  journal     (journal uses scoring services)
+diversity <-  journal     (journal uses diversity counting)
+journal   <-  suggestion  (suggestion reads journal breakdown)
+diversity <-  suggestion  (suggestion reads diversity result)
+food      <-  journal     (journal references food data)
+food      <-  favorite    (favorite references food data)
 ```
 
 Import via relative path, not via the domain index:
@@ -316,30 +263,31 @@ import { countDistinct } from '../../diversity/services/rolling-window.service.j
 
 ## What Goes Where
 
-| Artifact                     | Package        | Location                                          |
-|------------------------------|----------------|---------------------------------------------------|
-| Shared enums/constants       | `@thirty/shared` | `packages/shared/src/index.ts`                  |
-| Domain types (VOs, entities) | `@thirty/core` | `packages/core/src/domains/<domain>/`             |
-| Business logic (services)    | `@thirty/core` | `packages/core/src/domains/<domain>/services/`    |
-| Use cases                    | `@thirty/core` | `packages/core/src/domains/<domain>/use-cases/`   |
-| Repository interfaces        | `@thirty/core` | `packages/core/src/domains/<domain>/repositories/`|
-| In-memory repos              | `@thirty/core` | `packages/core/src/infrastructure/repositories/`  |
-| Prisma repos                 | `@thirty/api`  | `apps/api/src/repositories/`                      |
-| NestJS modules/controllers   | `@thirty/api`  | `apps/api/src/modules/`                           |
-| Prisma schema                | `@thirty/api`  | `apps/api/prisma/schema.prisma`                   |
-| React components             | `@thirty/web`  | `apps/web/src/`                                   |
-| Food seed data               | `@thirty/food-db` | `packages/food-db/src/`                        |
+| Artifact                     | Package          | Location                                              |
+|------------------------------|------------------|-------------------------------------------------------|
+| Types, interfaces, DTOs      | `@thirty/shared` | `packages/shared/src/`                                |
+| Enums, constants             | `@thirty/shared` | `packages/shared/src/`                                |
+| Zod validators               | `@thirty/shared` | `packages/shared/src/validators/`                     |
+| Business logic (services)    | `@thirty/core`   | `packages/core/src/domains/<domain>/services/`        |
+| Use cases (classes)          | `@thirty/core`   | `packages/core/src/domains/<domain>/use-cases/`       |
+| Repository interfaces        | `@thirty/core`   | `packages/core/src/domains/<domain>/repositories/`    |
+| In-memory repos              | `@thirty/core`   | `packages/core/src/infrastructure/<domain>/`          |
+| Prisma repos                 | `@thirty/core`   | `packages/core/src/infrastructure/<domain>/`          |
+| NestJS controllers           | `@thirty/api`    | `apps/api/src/<domain>/`                              |
+| Prisma schema                | `@thirty/db`     | `packages/db/prisma/schema.prisma`                    |
+| Seed data                    | `@thirty/db`     | `packages/db/seed/`                                   |
+| React components             | `@thirty/web`    | `apps/web/src/`                                       |
 
 ## Adding a New Domain Concept - Checklist
 
-1. Decide which domain it belongs to (scoring, journal, diversity, suggestion)
-2. Create the VO/entity file with `readonly` properties
+1. Decide which domain (scoring, journal, diversity, suggestion, food, favorite)
+2. If a new type is needed, add it to `@thirty/shared`
 3. If computation is needed, create a pure service function
-4. If orchestration is needed, create a use case
+4. If orchestration is needed, create a use case class with injected ports
 5. If persistence is needed:
    a. Define the repository interface (port) in the domain
-   b. Create the in-memory implementation in `infrastructure/`
-   c. Create the Prisma implementation in `apps/api/`
+   b. Create the in-memory implementation in `infrastructure/<domain>/`
+   c. Create the Prisma implementation in `infrastructure/<domain>/`
 6. Export from the domain `index.ts`
 7. Export from `src/index.ts` if needed externally
 8. Write colocated tests (see `testing` skill)

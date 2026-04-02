@@ -33,11 +33,11 @@ Les apps de tracking alimentaire comptent les calories. Thirty score ton aliment
 thirty/
 ├── apps/
 │   ├── web/              # React PWA (mobile-first)
-│   └── api/              # NestJS API
+│   └── api/              # NestJS API (pur HTTP adapter)
 ├── packages/
-│   ├── shared/           # Types partagés, DTOs, constantes
-│   ├── scoring/          # Moteur de scoring microbiote (pur TS)
-│   └── food-db/          # Base de données aliments (seed, validateurs)
+│   ├── shared/           # Types, interfaces, DTOs, validators Zod, enums, constantes
+│   ├── db/               # Schema Prisma, client, migrations, seed data
+│   ├── core/             # Logique métier, use cases, ports, adapters Prisma
 ├── docs/
 │   ├── prd.md            # Product Requirements Document
 │   ├── adr/              # Architecture Decision Records
@@ -55,6 +55,8 @@ thirty/
 - [ADR-005 — Mode de préparation comme multiplicateur](./docs/adr/adr_005.md)
 - [ADR-006 — Better Auth vs Passport.js](./docs/adr/adr_006.md)
 - [ADR-007 — Coolify sur Hetzner vs Fly.io](./docs/adr/adr_007.md)
+- [ADR-008 - Clean architecture DDD par domaine](./docs/adr/adr_008.md)
+- [ADR-009 - Types dans shared, adapters dans core, package @thirty/db](./docs/adr/adr_009.md)
 
 ## Getting Started
 
