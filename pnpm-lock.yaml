@@ -193,6 +193,8 @@ importers:
 
   apps/web: {}
 
+  packages/config-typescript: {}
+
   packages/core:
     dependencies:
       '@thirty/shared':

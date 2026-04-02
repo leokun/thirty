@@ -1,0 +1,12 @@
+{
+  "name": "@thirty/config-typescript",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.json": "./base.json",
+    "./library.json": "./library.json",
+    "./react.json": "./react.json",
+    "./nestjs.json": "./nestjs.json"
+  }
+}

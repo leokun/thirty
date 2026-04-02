@@ -1,7 +1,6 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../packages/config-typescript/react.json",
   "compilerOptions": {
-    "jsx": "react-jsx",
     "outDir": "./dist",
     "rootDir": "./src"
   },

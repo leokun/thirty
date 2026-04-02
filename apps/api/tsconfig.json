@@ -1,10 +1,8 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../packages/config-typescript/nestjs.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "rootDir": "./src"
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist", "src/generated"]
