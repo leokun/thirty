@@ -2,7 +2,7 @@
   "name": "@thirty/api",
   "version": "0.1.0",
   "private": true,
-  "description": "Thirty — NestJS API",
+  "description": "Thirty - NestJS API",
   "scripts": {
     "dev": "nest start --watch",
     "build": "nest build",

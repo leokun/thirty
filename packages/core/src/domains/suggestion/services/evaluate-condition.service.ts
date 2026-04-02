@@ -1,5 +1,5 @@
 // =============================================================================
-// Evaluate condition — évalue une condition de suggestion vs contexte
+// Evaluate condition - evaluates a suggestion condition against context
 // =============================================================================
 
 import type { SuggestionCondition, SuggestionMetric } from '../value-objects/suggestion-condition.vo.js';

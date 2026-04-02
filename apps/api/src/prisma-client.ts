@@ -1,22 +1,22 @@
 // =============================================================================
-// Thirty — Prisma Client Instance (Prisma 7)
+// Thirty - Prisma Client Instance (Prisma 7)
 // =============================================================================
-// Prisma 7 requiert un driver adapter explicite.
-// Plus de new PrismaClient() sans argument.
+// Prisma 7 requires an explicit driver adapter.
+// No more new PrismaClient() without arguments.
 // =============================================================================
 
 import { PrismaClient } from "./generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-// Le driver adapter gère le pool de connexions
-// Prisma 7 délègue le pooling au driver natif (pg)
+// The driver adapter manages the connection pool
+// Prisma 7 delegates pooling to the native driver (pg)
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
-  // Config pool — en Prisma 7, c'est le driver pg qui gère,
-  // pas Prisma (contrairement à v6)
+  // Pool config - in Prisma 7, the pg driver handles this,
+  // not Prisma (unlike v6)
   pool: {
     max: 10,
-    connectionTimeoutMillis: 5000, // Prisma 6 avait 5s par défaut, pg a 0 par défaut
+    connectionTimeoutMillis: 5000, // Prisma 6 defaulted to 5s, pg defaults to 0
   },
 });
 

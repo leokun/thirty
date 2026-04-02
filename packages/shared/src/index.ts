@@ -1,5 +1,5 @@
 // =============================================================================
-// @thirty/shared — Types partagés, DTOs, constantes
+// @thirty/shared - Shared types, DTOs, constants
 // =============================================================================
 
 // --- Enums ---
@@ -73,4 +73,3 @@ export const SCORING_WEIGHTS = {
 
 export const WEEKLY_PLANT_GOAL = 30;
 export const ROLLING_WINDOW_DAYS = 7;
-

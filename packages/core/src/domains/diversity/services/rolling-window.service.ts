@@ -1,5 +1,5 @@
 // =============================================================================
-// Rolling window — fenêtre glissante J-6 à J (ADR-004)
+// Rolling window - sliding window D-6 to D (ADR-004)
 // =============================================================================
 
 import { ROLLING_WINDOW_DAYS } from '@thirty/shared';
@@ -7,9 +7,9 @@ import type { FoodLogEntry } from '../../journal/entities/food-log.entity.js';
 import type { RollingWindowData } from '../value-objects/rolling-window.vo.js';
 
 /**
- * Calcule la date de début de la fenêtre glissante (J-6).
- * @param referenceDate - Date de référence au format YYYY-MM-DD
- * @returns Date de début au format YYYY-MM-DD
+ * Computes the start date of the rolling window (D-6).
+ * @param referenceDate - Reference date in YYYY-MM-DD format
+ * @returns Start date in YYYY-MM-DD format
  */
 export function computeWindowStart(referenceDate: string): string {
   const date = new Date(referenceDate);
@@ -18,7 +18,7 @@ export function computeWindowStart(referenceDate: string): string {
 }
 
 /**
- * Filtre les jours pour ne garder que ceux dans la fenêtre J-6..J.
+ * Filters days to keep only those within the D-6..D window.
  */
 export function filterToWindow(
   data: RollingWindowData,
@@ -31,14 +31,14 @@ export function filterToWindow(
 }
 
 /**
- * Extrait tous les FoodLogEntry d'une fenêtre, aplatis.
+ * Extracts all FoodLogEntry from a window, flattened.
  */
 export function flattenFoodLogs(data: RollingWindowData): readonly FoodLogEntry[] {
   return data.days.flatMap((d) => d.meals.flatMap((m) => m.foodLogs));
 }
 
 /**
- * Compte le nombre d'aliments distincts (par foodId) matchant un prédicat.
+ * Counts the number of distinct foods (by foodId) matching a predicate.
  */
 export function countDistinct(
   data: RollingWindowData,
@@ -58,7 +58,7 @@ export function countDistinct(
 }
 
 /**
- * Retourne les foodIds uniques matchant un prédicat.
+ * Returns unique foodIds matching a predicate.
  */
 export function uniqueFoodIds(
   data: RollingWindowData,

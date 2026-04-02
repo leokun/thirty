@@ -1,12 +1,12 @@
 // =============================================================================
-// Thirty — Prisma Schema (Prisma 7)
-// Tracker alimentaire centré microbiote intestinal
+// Thirty - Prisma Schema (Prisma 7)
+// Gut microbiome-focused food tracker
 // =============================================================================
-// Prisma 7 breaking changes appliquées :
-// - provider "prisma-client" (Rust-free, ESM, TS natif)
-// - output obligatoire (généré dans src/, pas node_modules)
-// - driver adapter requis (PrismaPg) — configuré dans prisma.config.ts
-// - prisma.config.ts pour la datasource URL (plus dans schema.prisma)
+// Prisma 7 breaking changes applied:
+// - provider "prisma-client" (Rust-free, ESM, native TS)
+// - output required (generated into src/, not node_modules)
+// - driver adapter required (PrismaPg) - configured in prisma.config.ts
+// - prisma.config.ts for datasource URL (no longer in schema.prisma)
 // =============================================================================
 
 generator client {
@@ -16,8 +16,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // URL configurée dans prisma.config.ts (Prisma 7)
-  // url = env("DATABASE_URL") ← ne plus utiliser ici
+  // URL configured in prisma.config.ts (Prisma 7)
+  // url = env("DATABASE_URL") <- no longer used here
 }
 
 // =============================================================================
@@ -25,58 +25,58 @@ datasource db {
 // =============================================================================
 
 enum FoodCategory {
-  VEGETABLE        // légume
+  VEGETABLE        // vegetable
   FRUIT            // fruit
-  LEGUME           // légumineuse
-  GRAIN            // céréale
-  NUT_SEED         // noix / graine
-  HERB_SPICE       // herbe / épice
-  DAIRY            // produit laitier (yaourt, lait, crème)
-  CHEESE           // fromage (séparé car profil microbiote distinct)
-  MEAT             // viande
-  FISH             // poisson / fruits de mer
-  EGG              // œuf
-  FERMENTED_CONDIMENT // miso, sauce soja, nuoc-mam, vinaigre…
-  BEVERAGE         // thé, café, kombucha, kéfir d'eau
-  OTHER            // inclassable
+  LEGUME           // legume
+  GRAIN            // grain
+  NUT_SEED         // nut / seed
+  HERB_SPICE       // herb / spice
+  DAIRY            // dairy product (yogurt, milk, cream)
+  CHEESE           // cheese (separate due to distinct microbiome profile)
+  MEAT             // meat
+  FISH             // fish / seafood
+  EGG              // egg
+  FERMENTED_CONDIMENT // miso, soy sauce, fish sauce, vinegar...
+  BEVERAGE         // tea, coffee, kombucha, water kefir
+  OTHER            // unclassifiable
 }
 
 enum PreparationMethod {
-  RAW              // cru
-  STEAMED          // cuit vapeur
-  BOILED           // bouilli
-  ROASTED          // rôti / grillé
-  FRIED            // frit
-  FERMENTED        // fermenté
-  LACTOFERMENTED   // lactofermenté
-  SPROUTED         // germé
-  SOAKED           // trempé
-  DRIED            // séché
-  AGED             // affiné (fromages)
-  SMOKED           // fumé
+  RAW              // raw
+  STEAMED          // steamed
+  BOILED           // boiled
+  ROASTED          // roasted / grilled
+  FRIED            // fried
+  FERMENTED        // fermented
+  LACTOFERMENTED   // lacto-fermented
+  SPROUTED         // sprouted
+  SOAKED           // soaked
+  DRIED            // dried
+  AGED             // aged (cheeses)
+  SMOKED           // smoked
 }
 
 enum MealMoment {
-  BREAKFAST        // petit-déjeuner
-  LUNCH            // déjeuner
-  DINNER           // dîner
-  SNACK            // collation
+  BREAKFAST        // breakfast
+  LUNCH            // lunch
+  DINNER           // dinner
+  SNACK            // snack
 }
 
 enum PortionSize {
-  SMALL            // petite
-  MEDIUM           // moyenne
-  LARGE            // grande
+  SMALL            // small
+  MEDIUM           // medium
+  LARGE            // large
 }
 
 enum SuggestionType {
-  DIVERSITY        // diversité végétale
-  FERMENTED        // aliments fermentés
-  PREPARATION      // mode de préparation
-  SEASONAL         // saisonnalité
-  POLYPHENOL       // polyphénols
-  MUCOSAL_SUPPORT  // soutien muqueux (oméga-3, collagène…)
-  CHEESE           // fromages affinés vs industriels
+  DIVERSITY        // plant diversity
+  FERMENTED        // fermented foods
+  PREPARATION      // preparation method
+  SEASONAL         // seasonality
+  POLYPHENOL       // polyphenols
+  MUCOSAL_SUPPORT  // mucosal support (omega-3, collagen...)
+  CHEESE           // aged vs industrial cheeses
 }
 
 enum Trend {
@@ -86,32 +86,32 @@ enum Trend {
 }
 
 // =============================================================================
-// AUTH — Tables gérées par Better Auth
+// AUTH - Tables managed by Better Auth
 // =============================================================================
-// Better Auth crée et gère ses propres tables (user, session, account, 
-// verification). On ne les redéfinit PAS ici — l'adapter Prisma de Better Auth
-// s'en charge.
+// Better Auth creates and manages its own tables (user, session, account,
+// verification). We do NOT redefine them here - the Better Auth Prisma
+// adapter handles that.
 //
-// On étend le profil utilisateur via une table séparée UserProfile liée au
-// user Better Auth par son ID.
+// We extend the user profile via a separate UserProfile table linked to
+// the Better Auth user by ID.
 // =============================================================================
 
 // =============================================================================
-// USER PROFILE — Extension du user Better Auth
+// USER PROFILE - Better Auth user extension
 // =============================================================================
 
 model UserProfile {
   id        String   @id @default(cuid())
-  userId    String   @unique // FK vers le user Better Auth
-  
-  // Préférences
+  userId    String   @unique // FK to Better Auth user
+
+  // Preferences
   displayName String?
   timezone    String   @default("Europe/Paris")
   locale      String   @default("fr")
-  
-  // Objectifs personnalisables
-  weeklyPlantGoal  Int @default(30)  // objectif plantes/semaine (défaut 30)
-  
+
+  // Customizable goals
+  weeklyPlantGoal  Int @default(30)  // plants/week goal (default 30)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -123,43 +123,43 @@ model UserProfile {
 }
 
 // =============================================================================
-// FOOD — Base de données aliments curatée
+// FOOD - Curated food database
 // =============================================================================
 
 model Food {
   id        String       @id @default(cuid())
-  
+
   // Identification
-  nameFr    String       // nom français (clé de recherche principale)
-  nameEn    String?      // nom anglais (optionnel)
+  nameFr    String       // French name (primary search key)
+  nameEn    String?      // English name (optional)
   category  FoodCategory
-  isPlant   Boolean      @default(false) // compte pour le "30 plants"
-  
-  // Profil microbiote — scores de base (0-5)
-  solubleFiberScore    Float @default(0) // fibres solubles
-  insolubleFiberScore  Float @default(0) // fibres insolubles
-  prebioticScore       Float @default(0) // inuline, FOS, GOS, amidon résistant
-  polyphenolScore      Float @default(0) // polyphénols
+  isPlant   Boolean      @default(false) // counts toward "30 plants"
+
+  // Microbiome profile - base scores (0-5)
+  solubleFiberScore    Float @default(0) // soluble fiber
+  insolubleFiberScore  Float @default(0) // insoluble fiber
+  prebioticScore       Float @default(0) // inulin, FOS, GOS, resistant starch
+  polyphenolScore      Float @default(0) // polyphenols
   isFermented          Boolean @default(false)
-  probioticsScore      Float @default(0) // densité micro-organismes vivants
-  omega3Score          Float @default(0) // oméga-3
-  mucosalSupportScore  Float @default(0) // collagène, glutamine, zinc
-  
-  // Métadonnées
-  seasonMonths  Int[]    // [1-12], ex: [9,10,11] pour les courges
-  synonyms      String[] // ex: ["courgette", "zucchini"]
-  tags          String[] // ex: ["riche en inuline", "source d'oméga-3"]
-  sources       String[] // références bibliographiques du scoring
-  
-  // Préparations disponibles pour cet aliment
-  // (pas de "yaourt germé" ni de "persil affiné")
+  probioticsScore      Float @default(0) // live microorganism density
+  omega3Score          Float @default(0) // omega-3
+  mucosalSupportScore  Float @default(0) // collagen, glutamine, zinc
+
+  // Metadata
+  seasonMonths  Int[]    // [1-12], e.g. [9,10,11] for squash
+  synonyms      String[] // e.g. ["courgette", "zucchini"]
+  tags          String[] // e.g. ["rich in inulin", "omega-3 source"]
+  sources       String[] // scoring bibliographic references
+
+  // Available preparations for this food
+  // (no "sprouted yogurt" or "aged parsley")
   availablePreparations PreparationMethod[]
   defaultPreparation    PreparationMethod @default(RAW)
-  
-  // Flag pour les aliments ajoutés par les utilisateurs (pas curatés)
+
+  // Flag for user-added foods (not curated)
   isUserCreated Boolean @default(false)
   createdByUserId String?
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -167,7 +167,7 @@ model Food {
   preparationModifiers PreparationModifier[]
   foodLogs             FoodLog[]
 
-  // Index pour la recherche
+  // Search indexes
   @@index([nameFr])
   @@index([category])
   @@index([isPlant])
@@ -175,11 +175,11 @@ model Food {
 }
 
 // =============================================================================
-// PREPARATION MODIFIER — Facteurs multiplicateurs par mode de préparation
+// PREPARATION MODIFIER - Multiplier factors per preparation method
 // =============================================================================
-// ADR-005 : système hybride multiplicateurs + overrides
-// Le score final = score_base × facteur + bonus
-// L'override remplace le score de base si présent (cas des fermentés)
+// ADR-005: hybrid system with multipliers + overrides
+// Final score = base_score x factor + bonus
+// Override replaces the base score when present (e.g. fermented foods)
 // =============================================================================
 
 model PreparationModifier {
@@ -187,18 +187,18 @@ model PreparationModifier {
   foodId  String
   method  PreparationMethod
 
-  // Facteurs multiplicateurs (appliqués aux scores de base du Food)
+  // Multiplier factors (applied to Food base scores)
   fiberFactor      Float @default(1.0)  // 0.0 - 2.0
   prebioticFactor  Float @default(1.0)
   polyphenolFactor Float @default(1.0)
   probioticsFactor Float @default(1.0)
   microbiomeBonus  Float @default(0)    // -2 to +5
 
-  // Override optionnel (ADR-005)
-  // Si présent, remplace le score de base au lieu de le multiplier
-  // Ex: choucroute override le probioticsScore à 4 car ce n'est plus
-  // juste "du chou × un facteur"
-  overrideProfile  Json?  // Partial<MicrobiomeProfile> en JSONB
+  // Optional override (ADR-005)
+  // When present, replaces the base score instead of multiplying it
+  // E.g. sauerkraut overrides probioticsScore to 4 because it's no longer
+  // just "cabbage x a factor"
+  overrideProfile  Json?  // Partial<MicrobiomeProfile> as JSONB
 
   // Relations
   food Food @relation(fields: [foodId], references: [id], onDelete: Cascade)
@@ -208,15 +208,15 @@ model PreparationModifier {
 }
 
 // =============================================================================
-// MEAL ENTRY — Un repas (moment de la journée)
+// MEAL ENTRY - A meal (time of day)
 // =============================================================================
 
 model MealEntry {
   id            String     @id @default(cuid())
   userProfileId String
-  date          DateTime   @db.Date // date du repas (sans heure)
+  date          DateTime   @db.Date // meal date (no time)
   moment        MealMoment
-  note          String?    // note libre optionnelle ("chez maman", "resto japonais")
+  note          String?    // optional free-text note ("at mom's", "Japanese restaurant")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -231,7 +231,7 @@ model MealEntry {
 }
 
 // =============================================================================
-// FOOD LOG — Un aliment loggé dans un repas
+// FOOD LOG - A food logged in a meal
 // =============================================================================
 
 model FoodLog {
@@ -239,10 +239,10 @@ model FoodLog {
   mealEntryId     String
   foodId          String
   preparationMethod PreparationMethod
-  portionSize     PortionSize?      // optionnel (ADR : pas de grammage obligatoire)
+  portionSize     PortionSize?      // optional (ADR: no mandatory gram tracking)
 
-  // Score calculé au moment du log (dénormalisé pour perf)
-  // Permet de ne pas recalculer si les facteurs changent
+  // Score computed at log time (denormalized for performance)
+  // Avoids recomputation if factors change
   computedScore   Json?             // { fiber, prebiotic, polyphenol, probiotics, omega3, mucosal, bonus }
 
   createdAt DateTime @default(now())
@@ -257,10 +257,10 @@ model FoodLog {
 }
 
 // =============================================================================
-// DAILY SCORE — Score microbiote quotidien (dénormalisé)
+// DAILY SCORE - Daily microbiome score (denormalized)
 // =============================================================================
-// Calculé/recalculé à chaque log d'aliment pour la date concernée.
-// Stocké pour éviter de recalculer l'historique à chaque affichage.
+// Computed/recomputed on each food log for the given date.
+// Stored to avoid recomputing history on every display.
 // =============================================================================
 
 model DailyScore {
@@ -268,20 +268,20 @@ model DailyScore {
   userProfileId String
   date          DateTime @db.Date
 
-  // Score global (0-100)
+  // Overall score (0-100)
   totalScore    Float
 
-  // Breakdown par axe (0-100 chacun)
-  diversityScore      Float // diversité végétale (semaine glissante)
+  // Per-axis breakdown (0-100 each)
+  diversityScore      Float // plant diversity (rolling week)
   fiberPrebioticScore Float
   fermentedScore      Float
   polyphenolScore     Float
   mucosalSupportScore Float
   preparationScore    Float
 
-  // Métriques de diversité (semaine glissante J-6 → J)
-  rollingPlantCount      Int   // nombre de plantes uniques sur 7 jours
-  rollingTotalFoodCount  Int   // nombre d'aliments uniques sur 7 jours (toutes catégories)
+  // Diversity metrics (rolling week D-6 to D)
+  rollingPlantCount      Int   // unique plants over 7 days
+  rollingTotalFoodCount  Int   // unique foods over 7 days (all categories)
   trend                  Trend @default(STABLE)
 
   createdAt DateTime @default(now())
@@ -296,32 +296,32 @@ model DailyScore {
 }
 
 // =============================================================================
-// SUGGESTION RULE — Règles de suggestions contextuelles
+// SUGGESTION RULE - Contextual suggestion rules
 // =============================================================================
-// Pas de ML — règles métier explicites (ADR-002)
-// Stockées en base pour être modifiables sans redéployer
+// No ML - explicit business rules (ADR-002)
+// Stored in DB to be editable without redeploying
 // =============================================================================
 
 model SuggestionRule {
   id              String         @id @default(cuid())
   type            SuggestionType
-  
-  // Condition de déclenchement (JSON structuré)
-  // Ex: { "metric": "fermented_days_without", "operator": ">=", "value": 5 }
+
+  // Trigger condition (structured JSON)
+  // E.g. { "metric": "fermented_days_without", "operator": ">=", "value": 5 }
   condition       Json
-  
-  // Template du message (avec placeholders)
-  // Ex: "Ça fait {days} jours sans aliment fermenté. Un peu de {suggestion} ?"
+
+  // Message template (with placeholders)
+  // E.g. "It's been {days} days without fermented food. How about some {suggestion}?"
   messageFr       String
   messageEn       String?
-  
-  // Contrôle d'affichage
-  cooldownHours   Int    @default(24)  // ne pas réafficher avant X heures
-  priority        Int    @default(50)  // 0-100, les plus prioritaires s'affichent d'abord
+
+  // Display control
+  cooldownHours   Int    @default(24)  // don't re-show before X hours
+  priority        Int    @default(50)  // 0-100, highest priority shown first
   isActive        Boolean @default(true)
 
-  // Aliments suggérés (optionnel)
-  suggestedFoodIds String[] // IDs de foods à suggérer dans le message
+  // Suggested foods (optional)
+  suggestedFoodIds String[] // food IDs to suggest in the message
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -333,7 +333,7 @@ model SuggestionRule {
 }
 
 // =============================================================================
-// SUGGESTION DISMISSAL — Suivi des suggestions vues/dismissées par user
+// SUGGESTION DISMISSAL - Tracking suggestions seen/dismissed per user
 // =============================================================================
 
 model SuggestionDismissal {
@@ -353,7 +353,7 @@ model SuggestionDismissal {
 }
 
 // =============================================================================
-// FAVORITE MEAL — Templates de repas favoris pour saisie rapide
+// FAVORITE MEAL - Favorite meal templates for quick entry
 // =============================================================================
 
 model FavoriteMeal {
@@ -361,13 +361,13 @@ model FavoriteMeal {
   // FK to Better Auth user table (not managed by Prisma, no @relation possible).
   // Referential integrity enforced at application level.
   userId        String
-  name          String     // "Mon petit-déj habituel"
+  name          String     // "My usual breakfast"
   moment        MealMoment?
-  
-  // Composition du favori
+
+  // Favorite composition
   items         Json       // Array<{ foodId, preparationMethod, portionSize? }>
 
-  usageCount    Int @default(0) // pour trier par fréquence d'utilisation
+  usageCount    Int @default(0) // for sorting by usage frequency
   lastUsedAt    DateTime?
 
   createdAt DateTime @default(now())

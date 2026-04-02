@@ -1,8 +1,8 @@
 // =============================================================================
-// Thirty — Prisma Config (Prisma 7)
+// Thirty - Prisma Config (Prisma 7)
 // =============================================================================
-// Prisma 7 sépare la config runtime (datasource URL, migrations)
-// du schema (models, enums). Ce fichier remplace les env() dans schema.prisma.
+// Prisma 7 separates runtime config (datasource URL, migrations)
+// from schema (models, enums). This file replaces env() in schema.prisma.
 // =============================================================================
 
 import "dotenv/config";

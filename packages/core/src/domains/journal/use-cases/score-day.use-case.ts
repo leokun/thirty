@@ -1,5 +1,5 @@
 // =============================================================================
-// Use case : scorer une journée complète → DailyScoreBreakdown
+// Use case: score a full day -> DailyScoreBreakdown
 // =============================================================================
 
 import type { DayData } from '../value-objects/day-data.vo.js';
@@ -25,30 +25,30 @@ export interface ScoreDayInput {
 }
 
 /**
- * Orchestre le scoring complet d'une journée :
- * 1. Score chaque food log
- * 2. Agrège par axe (fiber, fermented, polyphenol, mucosal, preparation)
- * 3. Calcule la diversité rolling
- * 4. Délègue à computeDailyScore pour la pondération finale
+ * Orchestrates the full scoring of a day:
+ * 1. Score each food log
+ * 2. Aggregate per axis (fiber, fermented, polyphenol, mucosal, preparation)
+ * 3. Compute rolling diversity
+ * 4. Delegate to computeDailyScore for final weighted score
  */
 export function scoreDay(input: ScoreDayInput): DailyScoreBreakdown {
-  // 1. Scorer les entrées du jour
+  // 1. Score today's entries
   const todayEntries = input.today.meals.flatMap((m) => m.foodLogs);
   const scoredLogs = scoreDayEntries(todayEntries);
 
-  // 2. Agréger par axe
+  // 2. Aggregate per axis
   const fiberPrebioticScore = aggregateFiberPrebioticScore(scoredLogs);
   const fermentedScore = aggregateFermentedScore(scoredLogs);
   const polyphenolScore = aggregatePolyphenolScore(scoredLogs);
   const mucosalSupportScore = aggregateMucosalSupportScore(scoredLogs);
   const preparationScore = aggregatePreparationScore(scoredLogs);
 
-  // 3. Diversité rolling
+  // 3. Rolling diversity
   const rollingPlantCount = countDistinct(input.rollingWindow, (e) => e.isPlant);
   const rollingTotalFoodCount = countDistinct(input.rollingWindow, () => true);
   const diversityScore = computeDiversityScore(rollingPlantCount);
 
-  // 4. Score final pondéré
+  // 4. Final weighted score
   return computeDailyScore({
     diversityScore,
     fiberPrebioticScore,

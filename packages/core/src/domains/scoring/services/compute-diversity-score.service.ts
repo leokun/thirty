@@ -1,12 +1,12 @@
 // =============================================================================
-// Diversity score — compteur 30 plantes / semaine glissante
+// Diversity score - 30 plants / rolling week counter
 // =============================================================================
 
 import { WEEKLY_PLANT_GOAL } from '@thirty/shared';
 
 /**
- * Calcule le score de diversité végétale (0-100)
- * basé sur le nombre de plantes uniques sur 7 jours glissants.
+ * Computes the plant diversity score (0-100)
+ * based on the number of unique plants over a 7-day rolling window.
  */
 export function computeDiversityScore(plantCount: number): number {
   if (plantCount >= WEEKLY_PLANT_GOAL) return 100;

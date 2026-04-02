@@ -1,5 +1,5 @@
 // =============================================================================
-// Use case : évaluer les suggestions contextuelles
+// Use case: evaluate contextual suggestions
 // =============================================================================
 
 import type { SuggestionRuleDef } from '../entities/suggestion-rule.entity.js';
@@ -10,8 +10,8 @@ import { evaluateCondition } from '../services/evaluate-condition.service.js';
 import { isOnCooldown } from '../services/cooldown.service.js';
 
 /**
- * Évalue toutes les règles actives contre le contexte utilisateur.
- * Filtre les règles en cooldown, trie par priorité décroissante.
+ * Evaluates all active rules against the user context.
+ * Filters out rules on cooldown, sorts by descending priority.
  */
 export function evaluateSuggestions(
   rules: readonly SuggestionRuleDef[],

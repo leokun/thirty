@@ -1,7 +1,7 @@
 // =============================================================================
-// Daily score — score microbiote quotidien composite (0-100)
+// Daily score - composite daily microbiome score (0-100)
 // =============================================================================
-// 6 axes pondérés, ADR-002 (règles métier explicites)
+// 6 weighted axes, ADR-002 (explicit business rules)
 // =============================================================================
 
 import { SCORING_WEIGHTS } from '@thirty/shared';
@@ -45,4 +45,3 @@ export function computeDailyScore(input: DailyScoreInput): DailyScoreBreakdown {
     trend,
   };
 }
-

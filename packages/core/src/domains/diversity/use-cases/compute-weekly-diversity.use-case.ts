@@ -1,5 +1,5 @@
 // =============================================================================
-// Use case : calculer la diversité hebdomadaire
+// Use case: compute weekly diversity
 // =============================================================================
 
 import type { RollingWindowData } from '../value-objects/rolling-window.vo.js';
@@ -8,7 +8,7 @@ import { countDistinct, uniqueFoodIds, flattenFoodLogs } from '../services/rolli
 import { computeTrend } from '../../shared/services/compute-trend.service.js';
 
 /**
- * Calcule le snapshot de diversité pour une fenêtre glissante.
+ * Computes the diversity snapshot for a rolling window.
  */
 export function computeWeeklyDiversity(
   currentWindow: RollingWindowData,
@@ -30,4 +30,3 @@ export function computeWeeklyDiversity(
     trend: computeTrend(rollingPlantCount, previousPlantCount, 3),
   };
 }
-

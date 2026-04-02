@@ -1,8 +1,8 @@
 // =============================================================================
 // Preparation modifier defaults
 // =============================================================================
-// Source : littérature scientifique (approximations raisonnées)
-// Ces valeurs seront affinées itérativement.
+// Source: scientific literature (reasoned approximations)
+// These values will be refined iteratively.
 // ADR-005
 // =============================================================================
 

@@ -1,5 +1,5 @@
 // =============================================================================
-// Cooldown — vérifie si une règle est en cooldown pour un utilisateur
+// Cooldown - checks if a rule is on cooldown for a user
 // =============================================================================
 
 import type { SuggestionRuleDef } from '../entities/suggestion-rule.entity.js';

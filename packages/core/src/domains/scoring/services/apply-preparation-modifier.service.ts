@@ -1,7 +1,7 @@
 // =============================================================================
 // Apply preparation modifiers to a food's base microbiome profile
 // =============================================================================
-// ADR-005 : multiplicateurs par défaut + overrides possibles
+// ADR-005: default multipliers + possible overrides
 // =============================================================================
 
 import type { MicrobiomeProfile } from '../value-objects/microbiome-profile.vo.js';
@@ -9,8 +9,8 @@ import type { PreparationModifier } from '../value-objects/preparation-modifier.
 import type { ComputedFoodScore } from '../value-objects/computed-food-score.vo.js';
 
 /**
- * Applique un modificateur de préparation au profil microbiote de base d'un aliment.
- * Si un override existe, il remplace les scores de base concernés.
+ * Applies a preparation modifier to a food's base microbiome profile.
+ * If an override exists, it replaces the affected base scores.
  */
 export function applyPreparationModifier(
   baseProfile: MicrobiomeProfile,

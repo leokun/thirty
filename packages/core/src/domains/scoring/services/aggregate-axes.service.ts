@@ -1,11 +1,11 @@
 // =============================================================================
-// Aggregate axes — food logs scorés → score par axe (0-100)
+// Aggregate axes - scored food logs -> per-axis score (0-100)
 // =============================================================================
 
 import type { ScoredFoodLog } from '../../journal/value-objects/scored-food-log.vo.js';
 
-// Seuils de normalisation : score max atteignable en une journée "parfaite".
-// Valeurs conservatrices, ajustables itérativement.
+// Normalization thresholds: max achievable score in a "perfect" day.
+// Conservative values, adjustable iteratively.
 const MAX_DAILY_FIBER = 40;
 const MAX_DAILY_PREBIOTIC = 20;
 const MAX_DAILY_FERMENTED_ITEMS = 4;
@@ -34,7 +34,7 @@ export function aggregateFermentedScore(logs: readonly ScoredFoodLog[]): number 
   const count = fermentedLogs.length;
   const uniqueFoods = new Set(fermentedLogs.map((l) => l.foodId));
 
-  // Présence (50%) + variété (50%)
+  // Presence (50%) + variety (50%)
   const presenceScore = Math.min(count / MAX_DAILY_FERMENTED_ITEMS, 1) * 50;
   const varietyScore = Math.min(uniqueFoods.size / MAX_DAILY_FERMENTED_ITEMS, 1) * 50;
   return clamp100(presenceScore + varietyScore);
@@ -65,7 +65,7 @@ export function aggregatePreparationScore(logs: readonly ScoredFoodLog[]): numbe
   for (const log of logs) {
     bonusSum += log.score.bonus;
   }
-  // Normalise autour de 50 (neutre) + bonus/malus
+  // Normalize around 50 (neutral) + bonus/penalty
   const normalized = 50 + (bonusSum / MAX_DAILY_BONUS) * 50;
   return clamp100(normalized);
 }

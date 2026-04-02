@@ -1,5 +1,5 @@
 // =============================================================================
-// Use case : scorer une entrée du journal alimentaire
+// Use case: score a food log entry
 // =============================================================================
 
 import type { FoodLogEntry } from '../entities/food-log.entity.js';
@@ -9,9 +9,9 @@ import { applyPreparationModifier } from '../../scoring/services/apply-preparati
 import { PREPARATION_DEFAULTS } from '../../scoring/constants/preparation-defaults.js';
 
 /**
- * Score une entrée du journal en résolvant le modifier approprié :
- * 1. customModifier de l'aliment (override spécifique en DB)
- * 2. PREPARATION_DEFAULTS (fallback par méthode de préparation)
+ * Scores a food log entry by resolving the appropriate modifier:
+ * 1. customModifier of the food (specific DB override)
+ * 2. PREPARATION_DEFAULTS (fallback per preparation method)
  */
 export function scoreFoodLog(entry: FoodLogEntry): ScoredFoodLog {
   const modifier: PreparationModifier = entry.customModifier
