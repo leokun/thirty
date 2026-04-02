@@ -9,6 +9,11 @@
   "dependencies": {
     "@thirty/shared": "workspace:*"
   },
+  "devDependencies": {
+    "@thirty/config-biome": "workspace:*",
+    "@thirty/config-typescript": "workspace:*",
+    "typescript": "^6.0.2"
+  },
   "scripts": {
     "lint": "biome check .",
     "check": "tsc --noEmit",

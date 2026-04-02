@@ -2,10 +2,14 @@
 // Use case: compute weekly diversity
 // =============================================================================
 
+import { computeTrend } from '../../shared/services/compute-trend.service.js';
+import {
+  countDistinct,
+  flattenFoodLogs,
+  uniqueFoodIds,
+} from '../services/rolling-window.service.js';
 import type { RollingWindowData } from '../value-objects/rolling-window.vo.js';
 import type { WeeklyDiversityResult } from '../value-objects/weekly-diversity-result.vo.js';
-import { countDistinct, uniqueFoodIds, flattenFoodLogs } from '../services/rolling-window.service.js';
-import { computeTrend } from '../../shared/services/compute-trend.service.js';
 
 /**
  * Computes the diversity snapshot for a rolling window.

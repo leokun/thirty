@@ -1,5 +1,5 @@
-import type { DailyScoreBreakdown } from '../../journal/value-objects/daily-score-breakdown.vo.js';
 import type { WeeklyDiversityResult } from '../../diversity/value-objects/weekly-diversity-result.vo.js';
+import type { DailyScoreBreakdown } from '../../journal/value-objects/daily-score-breakdown.vo.js';
 
 export interface SuggestionContext {
   readonly breakdown: DailyScoreBreakdown;

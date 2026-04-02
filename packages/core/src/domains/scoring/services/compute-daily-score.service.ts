@@ -23,11 +23,11 @@ export interface DailyScoreInput {
 export function computeDailyScore(input: DailyScoreInput): DailyScoreBreakdown {
   const totalScore = Math.round(
     input.diversityScore * SCORING_WEIGHTS.diversity +
-    input.fiberPrebioticScore * SCORING_WEIGHTS.fiberPrebiotic +
-    input.fermentedScore * SCORING_WEIGHTS.fermented +
-    input.polyphenolScore * SCORING_WEIGHTS.polyphenol +
-    input.mucosalSupportScore * SCORING_WEIGHTS.mucosalSupport +
-    input.preparationScore * SCORING_WEIGHTS.preparation,
+      input.fiberPrebioticScore * SCORING_WEIGHTS.fiberPrebiotic +
+      input.fermentedScore * SCORING_WEIGHTS.fermented +
+      input.polyphenolScore * SCORING_WEIGHTS.polyphenol +
+      input.mucosalSupportScore * SCORING_WEIGHTS.mucosalSupport +
+      input.preparationScore * SCORING_WEIGHTS.preparation,
   );
 
   const trend = computeTrend(totalScore, input.previousScore, 3);

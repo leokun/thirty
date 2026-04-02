@@ -4,9 +4,9 @@
 // ADR-005: default multipliers + possible overrides
 // =============================================================================
 
+import type { ComputedFoodScore } from '../value-objects/computed-food-score.vo.js';
 import type { MicrobiomeProfile } from '../value-objects/microbiome-profile.vo.js';
 import type { PreparationModifier } from '../value-objects/preparation-modifier.vo.js';
-import type { ComputedFoodScore } from '../value-objects/computed-food-score.vo.js';
 
 /**
  * Applies a preparation modifier to a food's base microbiome profile.

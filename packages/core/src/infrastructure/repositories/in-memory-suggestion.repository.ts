@@ -1,5 +1,5 @@
-import type { SuggestionRepository } from '../../domains/suggestion/repositories/suggestion.repository.js';
 import type { SuggestionRuleDef } from '../../domains/suggestion/entities/suggestion-rule.entity.js';
+import type { SuggestionRepository } from '../../domains/suggestion/repositories/suggestion.repository.js';
 import type { DismissalRecord } from '../../domains/suggestion/value-objects/dismissal-record.vo.js';
 
 export class InMemorySuggestionRepository implements SuggestionRepository {

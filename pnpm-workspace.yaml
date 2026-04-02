@@ -8,3 +8,10 @@
 packages:
   - "apps/*"
   - "packages/*"
+
+injectWorkspacePackages: true
+allowBuilds:
+  '@nestjs/core': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true

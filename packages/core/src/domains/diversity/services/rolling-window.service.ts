@@ -20,10 +20,7 @@ export function computeWindowStart(referenceDate: string): string {
 /**
  * Filters days to keep only those within the D-6..D window.
  */
-export function filterToWindow(
-  data: RollingWindowData,
-  referenceDate: string,
-): RollingWindowData {
+export function filterToWindow(data: RollingWindowData, referenceDate: string): RollingWindowData {
   const start = computeWindowStart(referenceDate);
   return {
     days: data.days.filter((d) => d.date >= start && d.date <= referenceDate),

@@ -7,6 +7,10 @@
   "engines": {
     "node": ">=24.0.0"
   },
+  "devDependencies": {
+    "@thirty/config-biome": "workspace:*",
+    "@thirty/config-typescript": "workspace:*"
+  },
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",

@@ -3,11 +3,11 @@
 // =============================================================================
 
 import type { SuggestionRuleDef } from '../entities/suggestion-rule.entity.js';
+import { isOnCooldown } from '../services/cooldown.service.js';
+import { evaluateCondition } from '../services/evaluate-condition.service.js';
+import type { DismissalRecord } from '../value-objects/dismissal-record.vo.js';
 import type { Suggestion } from '../value-objects/suggestion.vo.js';
 import type { SuggestionContext } from '../value-objects/suggestion-context.vo.js';
-import type { DismissalRecord } from '../value-objects/dismissal-record.vo.js';
-import { evaluateCondition } from '../services/evaluate-condition.service.js';
-import { isOnCooldown } from '../services/cooldown.service.js';
 
 /**
  * Evaluates all active rules against the user context.
@@ -26,9 +26,7 @@ export function evaluateSuggestions(
     if (isOnCooldown(rule, dismissals, context.now)) continue;
     if (!evaluateCondition(rule.condition, context)) continue;
 
-    const message = locale === 'en' && rule.messageEn
-      ? rule.messageEn
-      : rule.messageFr;
+    const message = locale === 'en' && rule.messageEn ? rule.messageEn : rule.messageFr;
 
     suggestions.push({
       ruleId: rule.id,

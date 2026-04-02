@@ -1,6 +1,6 @@
+import { computeWindowStart } from '../../domains/diversity/services/rolling-window.service.js';
 import type { FoodLogRepository } from '../../domains/journal/repositories/food-log.repository.js';
 import type { DayData } from '../../domains/journal/value-objects/day-data.vo.js';
-import { computeWindowStart } from '../../domains/diversity/services/rolling-window.service.js';
 
 export class InMemoryFoodLogRepository implements FoodLogRepository {
   private days = new Map<string, DayData>();

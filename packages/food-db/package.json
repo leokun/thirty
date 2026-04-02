@@ -6,10 +6,15 @@
   "description": "Curated food database - seed data, parsers, validators",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "devDependencies": {
+    "@thirty/config-biome": "workspace:*",
+    "@thirty/config-typescript": "workspace:*",
+    "typescript": "^6.0.2"
+  },
   "scripts": {
     "lint": "biome check .",
     "check": "tsc --noEmit",
     "test": "vitest",
-    "validate": "tsx src/validate.ts"
+    "validate": "node src/validate.ts"
   }
 }

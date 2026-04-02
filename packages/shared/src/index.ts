@@ -64,11 +64,11 @@ export type Trend = (typeof Trend)[keyof typeof Trend];
 
 export const SCORING_WEIGHTS = {
   diversity: 0.25,
-  fiberPrebiotic: 0.20,
-  fermented: 0.20,
-  polyphenol: 0.10,
+  fiberPrebiotic: 0.2,
+  fermented: 0.2,
+  polyphenol: 0.1,
   mucosalSupport: 0.15,
-  preparation: 0.10,
+  preparation: 0.1,
 } as const;
 
 export const WEEKLY_PLANT_GOAL = 30;

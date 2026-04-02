@@ -1,0 +1,12 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.10/schema.json",
+  "root": false,
+  // NestJS DI needs runtime imports, not type-only imports
+  "linter": {
+    "rules": {
+      "style": {
+        "useImportType": "off"
+      }
+    }
+  }
+}

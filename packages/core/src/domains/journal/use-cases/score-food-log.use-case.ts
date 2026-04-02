@@ -2,11 +2,11 @@
 // Use case: score a food log entry
 // =============================================================================
 
+import { PREPARATION_DEFAULTS } from '../../scoring/constants/preparation-defaults.js';
+import { applyPreparationModifier } from '../../scoring/services/apply-preparation-modifier.service.js';
+import type { PreparationModifier } from '../../scoring/value-objects/preparation-modifier.vo.js';
 import type { FoodLogEntry } from '../entities/food-log.entity.js';
 import type { ScoredFoodLog } from '../value-objects/scored-food-log.vo.js';
-import type { PreparationModifier } from '../../scoring/value-objects/preparation-modifier.vo.js';
-import { applyPreparationModifier } from '../../scoring/services/apply-preparation-modifier.service.js';
-import { PREPARATION_DEFAULTS } from '../../scoring/constants/preparation-defaults.js';
 
 /**
  * Scores a food log entry by resolving the appropriate modifier:
