@@ -1,0 +1,29 @@
+{
+  "name": "@thirty/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Prisma schema, client, migrations, seed data",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.6.0",
+    "@thirty/shared": "workspace:*",
+    "dotenv": "^17.4.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@thirty/config-biome": "workspace:*",
+    "@thirty/config-typescript": "workspace:*",
+    "prisma": "^7.6.0",
+    "typescript": "^6.0.2"
+  },
+  "scripts": {
+    "lint": "biome check .",
+    "check": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "tsx seed/seed.ts"
+  }
+}

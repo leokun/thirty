@@ -18,9 +18,9 @@
     "check": "turbo run check",
     "test": "turbo run test",
     "format": "biome format --write .",
-    "db:generate": "turbo run db:generate --filter=@thirty/api",
-    "db:push": "turbo run db:push --filter=@thirty/api",
-    "db:migrate": "turbo run db:migrate --filter=@thirty/api",
-    "db:seed": "turbo run db:seed --filter=@thirty/api"
+    "db:generate": "turbo run db:generate --filter=@thirty/db",
+    "db:push": "turbo run db:push --filter=@thirty/db",
+    "db:migrate": "turbo run db:migrate --filter=@thirty/db",
+    "db:seed": "turbo run db:seed --filter=@thirty/db"
   }
 }

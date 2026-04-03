@@ -7,7 +7,7 @@ Centralized database package: Prisma schema, generated client, PrismaPg connecti
 ## Key paths
 
 - `prisma/schema.prisma` - database schema
-- `prisma/prisma.config.ts` - Prisma 7 datasource config
+- `prisma.config.ts` - Prisma 7 datasource config (must be at package root)
 - `src/client.ts` - PrismaPg connection singleton
 - `src/generated/prisma/` - generated Prisma client (not in node_modules)
 - `src/index.ts` - re-exports prisma client + generated types
