@@ -2,7 +2,7 @@
 // Aggregate axes - scored food logs -> per-axis score (0-100)
 // =============================================================================
 
-import type { ScoredFoodLog } from '../../journal/value-objects/scored-food-log.vo.js';
+import type { ScoredFoodLog } from '@thirty/shared';
 
 // Normalization thresholds: max achievable score in a "perfect" day.
 // Conservative values, adjustable iteratively.

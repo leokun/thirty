@@ -7,12 +7,14 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "dependencies": {
+    "@thirty/db": "workspace:*",
     "@thirty/shared": "workspace:*"
   },
   "devDependencies": {
     "@thirty/config-biome": "workspace:*",
     "@thirty/config-typescript": "workspace:*",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
   },
   "scripts": {
     "lint": "biome check .",

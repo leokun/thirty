@@ -1,5 +1,4 @@
-import type { SuggestionRuleDef } from '../entities/suggestion-rule.entity.js';
-import type { DismissalRecord } from '../value-objects/dismissal-record.vo.js';
+import type { DismissalRecord, SuggestionRuleDef } from '@thirty/shared';
 
 export interface SuggestionRepository {
   getActiveRules(): Promise<readonly SuggestionRuleDef[]>;

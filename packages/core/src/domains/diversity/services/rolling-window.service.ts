@@ -2,9 +2,7 @@
 // Rolling window - sliding window D-6 to D (ADR-004)
 // =============================================================================
 
-import { ROLLING_WINDOW_DAYS } from '@thirty/shared';
-import type { FoodLogEntry } from '../../journal/entities/food-log.entity.js';
-import type { RollingWindowData } from '../value-objects/rolling-window.vo.js';
+import { type FoodLogEntry, ROLLING_WINDOW_DAYS, type RollingWindowData } from '@thirty/shared';
 
 /**
  * Computes the start date of the rolling window (D-6).

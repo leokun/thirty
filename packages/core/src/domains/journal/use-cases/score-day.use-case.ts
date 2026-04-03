@@ -2,8 +2,8 @@
 // Use case: score a full day -> DailyScoreBreakdown
 // =============================================================================
 
+import type { DailyScoreBreakdown, DayData, RollingWindowData } from '@thirty/shared';
 import { countDistinct } from '../../diversity/services/rolling-window.service.js';
-import type { RollingWindowData } from '../../diversity/value-objects/rolling-window.vo.js';
 import {
   aggregateFermentedScore,
   aggregateFiberPrebioticScore,
@@ -13,8 +13,6 @@ import {
 } from '../../scoring/services/aggregate-axes.service.js';
 import { computeDailyScore } from '../../scoring/services/compute-daily-score.service.js';
 import { computeDiversityScore } from '../../scoring/services/compute-diversity-score.service.js';
-import type { DailyScoreBreakdown } from '../value-objects/daily-score-breakdown.vo.js';
-import type { DayData } from '../value-objects/day-data.vo.js';
 import { scoreDayEntries } from './score-food-log.use-case.js';
 
 export interface ScoreDayInput {
@@ -57,6 +55,6 @@ export function scoreDay(input: ScoreDayInput): DailyScoreBreakdown {
     preparationScore,
     rollingPlantCount,
     rollingTotalFoodCount,
-    previousScore: input.previousDayScore,
+    ...(input.previousDayScore !== undefined && { previousScore: input.previousDayScore }),
   });
 }

@@ -2,12 +2,14 @@
 // Use case: evaluate contextual suggestions
 // =============================================================================
 
-import type { SuggestionRuleDef } from '../entities/suggestion-rule.entity.js';
+import type {
+  DismissalRecord,
+  Suggestion,
+  SuggestionContext,
+  SuggestionRuleDef,
+} from '@thirty/shared';
 import { isOnCooldown } from '../services/cooldown.service.js';
 import { evaluateCondition } from '../services/evaluate-condition.service.js';
-import type { DismissalRecord } from '../value-objects/dismissal-record.vo.js';
-import type { Suggestion } from '../value-objects/suggestion.vo.js';
-import type { SuggestionContext } from '../value-objects/suggestion-context.vo.js';
 
 /**
  * Evaluates all active rules against the user context.

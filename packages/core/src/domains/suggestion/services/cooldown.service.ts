@@ -2,8 +2,7 @@
 // Cooldown - checks if a rule is on cooldown for a user
 // =============================================================================
 
-import type { SuggestionRuleDef } from '../entities/suggestion-rule.entity.js';
-import type { DismissalRecord } from '../value-objects/dismissal-record.vo.js';
+import type { DismissalRecord, SuggestionRuleDef } from '@thirty/shared';
 
 const MS_PER_HOUR = 3_600_000;
 

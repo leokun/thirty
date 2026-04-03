@@ -4,8 +4,7 @@
 // 6 weighted axes, ADR-002 (explicit business rules)
 // =============================================================================
 
-import { SCORING_WEIGHTS } from '@thirty/shared';
-import type { DailyScoreBreakdown } from '../../journal/value-objects/daily-score-breakdown.vo.js';
+import { type DailyScoreBreakdown, SCORING_WEIGHTS } from '@thirty/shared';
 import { computeTrend } from '../../shared/services/compute-trend.service.js';
 
 export interface DailyScoreInput {

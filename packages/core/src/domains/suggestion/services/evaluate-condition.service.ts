@@ -2,11 +2,7 @@
 // Evaluate condition - evaluates a suggestion condition against context
 // =============================================================================
 
-import type {
-  SuggestionCondition,
-  SuggestionMetric,
-} from '../value-objects/suggestion-condition.vo.js';
-import type { SuggestionContext } from '../value-objects/suggestion-context.vo.js';
+import type { SuggestionCondition, SuggestionContext, SuggestionMetric } from '@thirty/shared';
 
 export function evaluateCondition(
   condition: SuggestionCondition,

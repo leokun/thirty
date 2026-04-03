@@ -6,8 +6,7 @@
 // ADR-005
 // =============================================================================
 
-import type { PreparationMethod } from '@thirty/shared';
-import type { PreparationModifier } from '../value-objects/preparation-modifier.vo.js';
+import type { PreparationMethod, PreparationModifier } from '@thirty/shared';
 
 type PreparationDefaults = Record<PreparationMethod, Omit<PreparationModifier, 'method'>>;
 
