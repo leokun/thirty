@@ -8,21 +8,15 @@
     "build": "nest build",
     "lint": "biome check .",
     "check": "tsc --noEmit",
-    "test": "vitest",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:seed": "node prisma/seed.ts"
+    "test": "vitest"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.17",
     "@nestjs/core": "^11.1.17",
     "@nestjs/platform-express": "^11.1.17",
-    "@prisma/adapter-pg": "^7.6.0",
     "@thirty/core": "workspace:*",
+    "@thirty/db": "workspace:*",
     "@thirty/shared": "workspace:*",
-    "dotenv": "^17.4.0",
-    "prisma": "^7.6.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
