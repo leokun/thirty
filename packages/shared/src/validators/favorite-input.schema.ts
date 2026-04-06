@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { MealMoment, PortionSize, PreparationMethod } from '../enums.js';
 
 const favoriteItemInputSchema = z.object({
-  foodId: z.string().uuid(),
+  foodId: z.string().min(1),
   preparationMethod: z.enum([
     PreparationMethod.RAW,
     PreparationMethod.STEAMED,

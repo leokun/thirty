@@ -5,6 +5,7 @@ export type {
   FavoriteResponse,
 } from './favorite.dto.js';
 export type {
+  CreateUserFoodInput,
   FoodResponse,
   RecentFoodResponse,
   SearchFoodQuery,

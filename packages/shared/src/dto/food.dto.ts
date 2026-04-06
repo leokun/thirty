@@ -10,7 +10,7 @@ export interface SearchFoodQuery {
 export interface FoodResponse {
   readonly id: string;
   readonly nameFr: string;
-  readonly nameEn?: string;
+  readonly nameEn: string;
   readonly category: FoodCategory;
   readonly isPlant: boolean;
   readonly availablePreparations: PreparationMethod[];
@@ -26,4 +26,10 @@ export interface RecentFoodResponse {
   readonly category: FoodCategory;
   readonly lastUsed: string;
   readonly useCount: number;
+}
+
+/** User-defined food when logging an item not in the curated catalog (F1). */
+export interface CreateUserFoodInput {
+  readonly nameFr: string;
+  readonly category: FoodCategory;
 }
