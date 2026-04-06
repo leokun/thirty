@@ -67,7 +67,7 @@ export class PrismaFavoriteRepository implements FavoriteRepository {
         userId,
         name: input.name,
         ...(input.moment !== undefined && { moment: input.moment }),
-        items: input.items as Prisma.InputJsonValue,
+        items: input.items as unknown as Prisma.InputJsonValue,
       },
     });
     return fav.id;
@@ -78,7 +78,7 @@ export class PrismaFavoriteRepository implements FavoriteRepository {
       where: { id: favoriteId },
     });
 
-    const items = fav.items as FavoriteItem[];
+    const items = fav.items as unknown as FavoriteItem[];
     const profile = (await prisma.userProfile.findUniqueOrThrow({
       where: { userId },
       select: { id: true },
