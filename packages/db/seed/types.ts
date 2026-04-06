@@ -2,7 +2,7 @@ import type { FoodCategory, PreparationMethod } from '@thirty/shared';
 
 export interface FoodDefinition {
   readonly nameFr: string;
-  readonly nameEn?: string;
+  readonly nameEn: string;
   readonly category: FoodCategory;
   readonly isPlant: boolean;
   readonly solubleFiberScore: number;

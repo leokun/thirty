@@ -131,7 +131,7 @@ model Food {
 
   // Identification
   nameFr    String       // French name (primary search key)
-  nameEn    String?      // English name (optional)
+  nameEn    String       // English name (always set; may match nameFr for user-created rows)
   category  FoodCategory
   isPlant   Boolean      @default(false) // counts toward "30 plants"
 

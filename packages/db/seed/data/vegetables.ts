@@ -35,7 +35,7 @@ export const vegetables: FoodDefinition[] = [
     omega3Score: 0.5,
     mucosalSupportScore: 1.5,
     seasonMonths: [3, 4, 5, 9, 10, 11],
-    synonyms: ['pousses d\'epinard'],
+    synonyms: ["pousses d'epinard"],
     tags: ['riche en fer', 'riche en folate'],
     sources: [],
     availablePreparations: ['RAW', 'STEAMED', 'BOILED'],

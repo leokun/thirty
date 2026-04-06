@@ -43,7 +43,7 @@ export const fermentedCondiments: FoodDefinition[] = [
     mucosalSupportScore: 1.5,
     seasonMonths: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     synonyms: ['miso blanc', 'miso rouge'],
-    tags: ['fermentation koji', 'Aspergillus oryzae', 'source d\'enzymes'],
+    tags: ['fermentation koji', 'Aspergillus oryzae', "source d'enzymes"],
     sources: [],
     availablePreparations: ['FERMENTED'],
     defaultPreparation: 'FERMENTED',

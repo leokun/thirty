@@ -5,7 +5,7 @@ const month = z.number().int().min(1).max(12);
 
 export const foodDefinitionSchema = z.object({
   nameFr: z.string().min(1),
-  nameEn: z.string().optional(),
+  nameEn: z.string().min(1),
   category: z.string(),
   isPlant: z.boolean(),
   solubleFiberScore: score0to5,
@@ -30,9 +30,7 @@ export const foodDefinitionSchema = z.object({
         polyphenolFactor: z.number().optional(),
         probioticsFactor: z.number().optional(),
         microbiomeBonus: z.number().optional(),
-        overrideProfile: z
-          .record(z.union([z.number(), z.boolean()]))
-          .optional(),
+        overrideProfile: z.record(z.union([z.number(), z.boolean()])).optional(),
       }),
     )
     .optional(),

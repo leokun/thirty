@@ -28,6 +28,7 @@ coverage/
 
 # IA
 .conductor/
+.emdash.json
 
 # Others
 plans/
