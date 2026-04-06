@@ -10,9 +10,14 @@ interface QuickAddPanelProps {
     >,
   ) => void;
   onApplyFavorite: (favoriteId: string) => void;
+  onStartCustomFood: () => void;
 }
 
-export function QuickAddPanel({ onSelectFood, onApplyFavorite }: QuickAddPanelProps) {
+export function QuickAddPanel({
+  onSelectFood,
+  onApplyFavorite,
+  onStartCustomFood,
+}: QuickAddPanelProps) {
   const { data: recentFoods } = useRecentFoods();
   const { data: favorites } = useFavorites();
 
@@ -63,6 +68,14 @@ export function QuickAddPanel({ onSelectFood, onApplyFavorite }: QuickAddPanelPr
           </div>
         </div>
       )}
+
+      <button
+        type="button"
+        onClick={onStartCustomFood}
+        className="min-h-11 w-full rounded-lg border border-dashed border-border bg-card px-3 py-2.5 text-left text-sm font-medium text-muted-foreground transition-colors active:bg-secondary"
+      >
+        Aliment absent de la base (saisie libre)
+      </button>
     </div>
   );
 }

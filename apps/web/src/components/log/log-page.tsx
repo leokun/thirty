@@ -1,10 +1,17 @@
 import { useNavigate } from '@tanstack/react-router';
-import type { FoodResponse, MealMoment, PortionSize, PreparationMethod } from '@thirty/shared';
-import { useState } from 'react';
+import {
+  type FoodCategory,
+  type FoodResponse,
+  type MealMoment,
+  type PortionSize,
+  PreparationMethod,
+} from '@thirty/shared';
+import { useMemo, useState } from 'react';
 import { useApplyFavorite } from '../../api/favorites.js';
 import { useFood } from '../../api/foods.js';
 import { useQuickAdd } from '../../api/journal.js';
 import { today } from '../../lib/date.js';
+import { FoodCategoryPicker } from './food-category-picker.js';
 import { FoodSearchInput } from './food-search-input.js';
 import { FoodSearchResults } from './food-search-results.js';
 import { getDefaultMoment, MealMomentPicker } from './meal-moment-picker.js';
@@ -17,14 +24,27 @@ interface LogPageProps {
   initialMoment?: MealMoment | undefined;
 }
 
-type Step = 'search' | 'preparation' | 'portion';
+type Step = 'search' | 'customCategory' | 'preparation';
 
-interface SelectedFood {
+const ALL_PREPARATIONS = Object.values(PreparationMethod) as PreparationMethod[];
+
+type CatalogSelection = {
+  kind: 'catalog';
   id: string;
   nameFr: string;
   availablePreparations: PreparationMethod[];
   defaultPreparation: PreparationMethod;
-}
+};
+
+type CustomSelection = {
+  kind: 'custom';
+  nameFr: string;
+  category: FoodCategory;
+  availablePreparations: PreparationMethod[];
+  defaultPreparation: PreparationMethod;
+};
+
+type DisplayFood = CatalogSelection | CustomSelection;
 
 export function LogPage({ initialDate, initialMoment }: LogPageProps) {
   const navigate = useNavigate();
@@ -33,40 +53,68 @@ export function LogPage({ initialDate, initialMoment }: LogPageProps) {
   const [moment, setMoment] = useState<MealMoment>(initialMoment ?? getDefaultMoment());
   const [step, setStep] = useState<Step>('search');
   const [query, setQuery] = useState('');
-  const [selectedFood, setSelectedFood] = useState<SelectedFood | null>(null);
-  const [preparation, setPreparation] = useState<PreparationMethod>('RAW');
-  const [portion, setPortion] = useState<PortionSize>('MEDIUM');
+  const [selectedFood, setSelectedFood] = useState<CatalogSelection | CustomSelection | null>(null);
+  const [preparation, setPreparation] = useState<PreparationMethod>(PreparationMethod.RAW);
+  const [portion, setPortion] = useState<PortionSize | null>(null);
+  const [customDraftName, setCustomDraftName] = useState('');
+  const [customCategory, setCustomCategory] = useState<FoodCategory | null>(null);
 
   const quickAdd = useQuickAdd();
   const applyFavorite = useApplyFavorite();
 
-  // If selected food came from recents (no preparations), fetch full food data
   const { data: fullFood } = useFood(
-    selectedFood && selectedFood.availablePreparations.length === 0 ? selectedFood.id : '',
+    selectedFood?.kind === 'catalog' && selectedFood.availablePreparations.length === 0
+      ? selectedFood.id
+      : '',
   );
 
-  const currentFood = selectedFood
-    ? selectedFood.availablePreparations.length > 0
-      ? selectedFood
-      : fullFood
-        ? {
-            ...selectedFood,
-            availablePreparations: fullFood.availablePreparations,
-            defaultPreparation: fullFood.defaultPreparation,
-          }
-        : selectedFood
-    : null;
+  const currentFood = useMemo((): DisplayFood | null => {
+    if (!selectedFood) return null;
+    if (selectedFood.kind === 'custom') return selectedFood;
+    if (selectedFood.availablePreparations.length > 0) return selectedFood;
+    if (fullFood) {
+      return {
+        kind: 'catalog',
+        id: selectedFood.id,
+        nameFr: selectedFood.nameFr,
+        availablePreparations: fullFood.availablePreparations,
+        defaultPreparation: fullFood.defaultPreparation,
+      };
+    }
+    return selectedFood;
+  }, [selectedFood, fullFood]);
 
   function handleSelectFood(
     food: Pick<FoodResponse, 'id' | 'nameFr' | 'availablePreparations' | 'defaultPreparation'>,
   ) {
     setSelectedFood({
+      kind: 'catalog',
       id: food.id,
       nameFr: food.nameFr,
       availablePreparations: food.availablePreparations,
       defaultPreparation: food.defaultPreparation,
     });
     setPreparation(food.defaultPreparation);
+    setStep('preparation');
+  }
+
+  function handleStartCustom(prefill: string) {
+    setCustomDraftName(prefill);
+    setCustomCategory(null);
+    setStep('customCategory');
+  }
+
+  function handleCustomContinue() {
+    const name = customDraftName.trim();
+    if (!name || customCategory == null) return;
+    setSelectedFood({
+      kind: 'custom',
+      nameFr: name,
+      category: customCategory,
+      availablePreparations: ALL_PREPARATIONS,
+      defaultPreparation: PreparationMethod.RAW,
+    });
+    setPreparation(PreparationMethod.RAW);
     setStep('preparation');
   }
 
@@ -77,35 +125,46 @@ export function LogPage({ initialDate, initialMoment }: LogPageProps) {
     );
   }
 
+  function resetAfterAdd() {
+    setStep('search');
+    setQuery('');
+    setSelectedFood(null);
+    setPreparation(PreparationMethod.RAW);
+    setPortion(null);
+    setCustomDraftName('');
+    setCustomCategory(null);
+  }
+
   function handleConfirm() {
     if (!currentFood) return;
-    quickAdd.mutate(
-      {
-        date,
-        moment,
-        foodId: currentFood.id,
-        preparationMethod: preparation,
-        portionSize: portion,
-      },
-      {
-        onSuccess: () => {
-          // Reset for another add
-          setStep('search');
-          setQuery('');
-          setSelectedFood(null);
-          setPreparation('RAW');
-          setPortion('MEDIUM');
+    const base = {
+      date,
+      moment,
+      preparationMethod: preparation,
+      ...(portion != null && { portionSize: portion }),
+    };
+    if (currentFood.kind === 'catalog') {
+      quickAdd.mutate({ ...base, foodId: currentFood.id }, { onSuccess: resetAfterAdd });
+    } else {
+      quickAdd.mutate(
+        {
+          ...base,
+          customFood: {
+            nameFr: currentFood.nameFr.trim(),
+            category: currentFood.category,
+          },
         },
-      },
-    );
+        { onSuccess: resetAfterAdd },
+      );
+    }
   }
 
   function handleBack() {
-    if (step === 'portion') {
-      setStep('preparation');
-    } else if (step === 'preparation') {
+    if (step === 'preparation') {
       setStep('search');
       setSelectedFood(null);
+    } else if (step === 'customCategory') {
+      setStep('search');
     } else {
       navigate({ to: '/journal' });
     }
@@ -130,10 +189,53 @@ export function LogPage({ initialDate, initialMoment }: LogPageProps) {
         <div className="space-y-3">
           <FoodSearchInput value={query} onChange={setQuery} />
           {query.length >= 2 ? (
-            <FoodSearchResults query={query} onSelect={handleSelectFood} />
+            <FoodSearchResults
+              query={query}
+              onSelect={handleSelectFood}
+              onAddCustom={handleStartCustom}
+            />
           ) : (
-            <QuickAddPanel onSelectFood={handleSelectFood} onApplyFavorite={handleApplyFavorite} />
+            <QuickAddPanel
+              onSelectFood={handleSelectFood}
+              onApplyFavorite={handleApplyFavorite}
+              onStartCustomFood={() => handleStartCustom('')}
+            />
           )}
+        </div>
+      )}
+
+      {step === 'customCategory' && (
+        <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="custom-food-name"
+              className="mb-1 block text-sm font-medium text-muted-foreground"
+            >
+              Nom de l&apos;aliment
+            </label>
+            <input
+              id="custom-food-name"
+              type="text"
+              value={customDraftName}
+              onChange={(e) => setCustomDraftName(e.target.value)}
+              placeholder="Ex. soupe du jour"
+              className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none ring-ring focus:ring-2"
+            />
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-muted-foreground">
+              Categorie (pour le score)
+            </p>
+            <FoodCategoryPicker value={customCategory} onChange={setCustomCategory} />
+          </div>
+          <button
+            type="button"
+            onClick={handleCustomContinue}
+            disabled={!customDraftName.trim() || customCategory == null}
+            className="min-h-11 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors disabled:opacity-50 active:opacity-90"
+          >
+            Continuer
+          </button>
         </div>
       )}
 
@@ -142,6 +244,11 @@ export function LogPage({ initialDate, initialMoment }: LogPageProps) {
           <div>
             <p className="mb-1 text-sm font-medium text-muted-foreground">Aliment</p>
             <p className="text-base font-semibold">{currentFood.nameFr}</p>
+            {currentFood.kind === 'custom' && (
+              <p className="text-xs text-muted-foreground">
+                Personnalise : score estime selon la categorie
+              </p>
+            )}
           </div>
           <div>
             <p className="mb-2 text-sm font-medium text-muted-foreground">Preparation</p>
@@ -156,36 +263,20 @@ export function LogPage({ initialDate, initialMoment }: LogPageProps) {
               <p className="text-sm text-muted-foreground">Chargement...</p>
             )}
           </div>
-          <button
-            type="button"
-            onClick={() => setStep('portion')}
-            disabled={currentFood.availablePreparations.length === 0}
-            className="min-h-11 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors disabled:opacity-50 active:opacity-90"
-          >
-            Suivant
-          </button>
-        </div>
-      )}
-
-      {step === 'portion' && currentFood && (
-        <div className="space-y-4">
           <div>
-            <p className="mb-1 text-sm font-medium text-muted-foreground">{currentFood.nameFr}</p>
-          </div>
-          <div>
-            <p className="mb-2 text-sm font-medium text-muted-foreground">Portion</p>
+            <p className="mb-2 text-sm font-medium text-muted-foreground">Portion (optionnel)</p>
             <PortionPicker value={portion} onChange={setPortion} />
           </div>
           <button
             type="button"
             onClick={handleConfirm}
-            disabled={quickAdd.isPending}
+            disabled={quickAdd.isPending || currentFood.availablePreparations.length === 0}
             className="min-h-11 w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-colors disabled:opacity-50 active:opacity-90"
           >
             {quickAdd.isPending ? 'Ajout...' : 'Ajouter'}
           </button>
           {quickAdd.isError && (
-            <p className="text-center text-sm text-destructive">Erreur lors de l'ajout</p>
+            <p className="text-center text-sm text-destructive">Erreur lors de l&apos;ajout</p>
           )}
         </div>
       )}

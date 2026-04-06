@@ -2,11 +2,12 @@ import type { PortionSize } from '@thirty/shared';
 import { cn } from '../../lib/cn.js';
 
 interface PortionPickerProps {
-  value: PortionSize;
-  onChange: (size: PortionSize) => void;
+  value: PortionSize | null;
+  onChange: (size: PortionSize | null) => void;
 }
 
-const PORTIONS: { value: PortionSize; label: string }[] = [
+const PORTIONS: { value: PortionSize | null; label: string }[] = [
+  { value: null, label: 'Defaut' },
   { value: 'SMALL', label: 'S' },
   { value: 'MEDIUM', label: 'M' },
   { value: 'LARGE', label: 'L' },

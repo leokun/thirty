@@ -5,6 +5,7 @@ import {
   GetDayJournalUseCase,
   PrismaDailyScoreRepository,
   PrismaFoodLogRepository,
+  PrismaFoodRepository,
   PrismaMealRepository,
   QuickAddUseCase,
   RemoveFoodLogUseCase,
@@ -80,7 +81,8 @@ export class JournalController {
     const mealRepo = new PrismaMealRepository();
     const foodLogRepo = new PrismaFoodLogRepository();
     const dailyScoreRepo = new PrismaDailyScoreRepository();
-    const useCase = new QuickAddUseCase(mealRepo, foodLogRepo, dailyScoreRepo);
+    const foodRepo = new PrismaFoodRepository();
+    const useCase = new QuickAddUseCase(mealRepo, foodLogRepo, dailyScoreRepo, foodRepo);
     const id = await useCase.execute(userId, input);
     return { id };
   }
