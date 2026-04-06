@@ -1,9 +1,16 @@
-import type { FoodResponse, RecentFoodResponse } from '@thirty/shared';
+import type { CreateUserFoodInput, FoodResponse, RecentFoodResponse } from '@thirty/shared';
+import { PreparationMethod } from '@thirty/shared';
 import type { FoodRepository } from '../../domains/food/repositories/food.repository.js';
+import {
+  defaultMicrobiomeProfileForCategory,
+  isPlantCategory,
+} from '../../domains/food/services/default-user-food-profile.service.js';
 
 export class InMemoryFoodRepository implements FoodRepository {
   private foods = new Map<string, FoodResponse>();
   private recentFoods = new Map<string, RecentFoodResponse[]>();
+  private userFoodDedup = new Map<string, string>();
+  private userFoodSeq = 0;
 
   async search(
     query: string,
@@ -16,7 +23,7 @@ export class InMemoryFoodRepository implements FoodRepository {
       if (options?.category && food.category !== options.category) continue;
 
       const matchesFr = food.nameFr.toLowerCase().includes(lowerQuery);
-      const matchesEn = food.nameEn?.toLowerCase().includes(lowerQuery);
+      const matchesEn = food.nameEn.toLowerCase().includes(lowerQuery);
 
       if (matchesFr || matchesEn) {
         results.push(food);
@@ -36,6 +43,35 @@ export class InMemoryFoodRepository implements FoodRepository {
     return recent.slice(0, limit);
   }
 
+  async createUserFood(userId: string, input: CreateUserFoodInput): Promise<string> {
+    const nameFr = input.nameFr.trim();
+    const dedupKey = `${userId}:${nameFr.toLowerCase()}`;
+    const existingId = this.userFoodDedup.get(dedupKey);
+    if (existingId) return existingId;
+
+    const id = `uf-${++this.userFoodSeq}`;
+    this.userFoodDedup.set(dedupKey, id);
+    const baseProfile = defaultMicrobiomeProfileForCategory(input.category);
+    this.foods.set(id, {
+      id,
+      nameFr,
+      nameEn: nameFr,
+      category: input.category,
+      isPlant: isPlantCategory(input.category),
+      availablePreparations: [...Object.values(PreparationMethod)],
+      defaultPreparation: PreparationMethod.RAW,
+      baseProfile,
+      seasonMonths: [],
+      tags: ['user-created'],
+    });
+    return id;
+  }
+
+  /** Test helper: read seeded food without async. */
+  peek(id: string): FoodResponse | undefined {
+    return this.foods.get(id);
+  }
+
   seedFood(food: FoodResponse): void {
     this.foods.set(food.id, food);
   }
@@ -53,5 +89,7 @@ export class InMemoryFoodRepository implements FoodRepository {
   clear(): void {
     this.foods.clear();
     this.recentFoods.clear();
+    this.userFoodDedup.clear();
+    this.userFoodSeq = 0;
   }
 }
