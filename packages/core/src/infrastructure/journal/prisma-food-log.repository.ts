@@ -1,12 +1,63 @@
 import { prisma } from '@thirty/db';
-import type { AddFoodLogInput, DayData, FoodLogEntry, MealData } from '@thirty/shared';
+import type {
+  AddFoodLogInput,
+  DayData,
+  FoodCategory,
+  FoodLogEntry,
+  MealData,
+  MealMoment,
+  PortionSize,
+  PreparationMethod,
+} from '@thirty/shared';
 import type { FoodLogRepository } from '../../domains/journal/repositories/food-log.repository.js';
 import { PREPARATION_DEFAULTS } from '../../domains/scoring/constants/preparation-defaults.js';
 import { applyPreparationModifier } from '../../domains/scoring/services/apply-preparation-modifier.service.js';
+import { applyPortionToAxisScores } from '../../domains/scoring/services/portion-multiplier.service.js';
+
+/** Narrow shape returned by mealEntry.findMany with foodLogs → food → preparationModifiers */
+type PreparationModifierRow = {
+  method: PreparationMethod;
+  fiberFactor: number;
+  prebioticFactor: number;
+  polyphenolFactor: number;
+  probioticsFactor: number;
+  microbiomeBonus: number;
+  overrideProfile?: unknown;
+};
+
+type FoodForLogRow = {
+  id: string;
+  nameFr: string;
+  category: FoodCategory;
+  isPlant: boolean;
+  solubleFiberScore: number;
+  insolubleFiberScore: number;
+  prebioticScore: number;
+  polyphenolScore: number;
+  isFermented: boolean;
+  probioticsScore: number;
+  omega3Score: number;
+  mucosalSupportScore: number;
+  preparationModifiers?: PreparationModifierRow[];
+};
+
+type FoodLogForMapRow = {
+  id: string;
+  preparationMethod: PreparationMethod;
+  portionSize: PortionSize | null;
+  food: FoodForLogRow;
+};
+
+type MealForMapRow = {
+  id: string;
+  moment: MealMoment;
+  date: Date;
+  foodLogs: FoodLogForMapRow[];
+};
 
 export class PrismaFoodLogRepository implements FoodLogRepository {
   async getDayData(userId: string, date: string): Promise<DayData> {
-    const meals = await prisma.mealEntry.findMany({
+    const meals = (await prisma.mealEntry.findMany({
       where: {
         userProfile: { userId },
         date: new Date(date),
@@ -21,7 +72,7 @@ export class PrismaFoodLogRepository implements FoodLogRepository {
         },
       },
       orderBy: { createdAt: 'asc' },
-    });
+    })) as MealForMapRow[];
 
     return {
       date,
@@ -34,7 +85,7 @@ export class PrismaFoodLogRepository implements FoodLogRepository {
     const startDate = new Date(referenceDate);
     startDate.setDate(startDate.getDate() - 6);
 
-    const meals = await prisma.mealEntry.findMany({
+    const meals = (await prisma.mealEntry.findMany({
       where: {
         userProfile: { userId },
         date: { gte: startDate, lte: endDate },
@@ -49,10 +100,9 @@ export class PrismaFoodLogRepository implements FoodLogRepository {
         },
       },
       orderBy: { date: 'asc' },
-    });
+    })) as MealForMapRow[];
 
-    // Group meals by date
-    const byDate = new Map<string, typeof meals>();
+    const byDate = new Map<string, MealForMapRow[]>();
     for (const meal of meals) {
       const d = meal.date.toISOString().slice(0, 10);
       const existing = byDate.get(d) ?? [];
@@ -111,16 +161,17 @@ export class PrismaFoodLogRepository implements FoodLogRepository {
           ...PREPARATION_DEFAULTS[input.preparationMethod],
         };
 
-    const computedScore = applyPreparationModifier(baseProfile, modifier);
+    const computedScore = applyPortionToAxisScores(
+      applyPreparationModifier(baseProfile, modifier),
+      input.portionSize ?? null,
+    );
 
     const log = await prisma.foodLog.create({
       data: {
         mealEntryId: mealId,
         foodId: input.foodId,
         preparationMethod: input.preparationMethod,
-        ...(input.portionSize !== undefined && {
-          portionSize: input.portionSize,
-        }),
+        portionSize: input.portionSize ?? null,
         computedScore: computedScore as unknown as Record<string, unknown>,
       },
     });
@@ -132,20 +183,18 @@ export class PrismaFoodLogRepository implements FoodLogRepository {
     await prisma.foodLog.delete({ where: { id: logId } });
   }
 
-  private mapMeal(meal: any): MealData {
+  private mapMeal(meal: MealForMapRow): MealData {
     return {
       id: meal.id,
       moment: meal.moment,
       date: meal.date.toISOString().slice(0, 10),
-      foodLogs: meal.foodLogs.map((log: any) => this.mapFoodLog(log)),
+      foodLogs: meal.foodLogs.map((log) => this.mapFoodLog(log)),
     };
   }
 
-  private mapFoodLog(log: any): FoodLogEntry {
+  private mapFoodLog(log: FoodLogForMapRow): FoodLogEntry {
     const food = log.food;
-    const customMod = food.preparationModifiers?.find(
-      (m: any) => m.method === log.preparationMethod,
-    );
+    const customMod = food.preparationModifiers?.find((m) => m.method === log.preparationMethod);
 
     return {
       id: log.id,

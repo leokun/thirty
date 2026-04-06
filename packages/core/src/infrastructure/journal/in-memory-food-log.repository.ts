@@ -1,8 +1,17 @@
-import type { AddFoodLogInput, DayData } from '@thirty/shared';
+import type { AddFoodLogInput, DayData, FoodCategory, MicrobiomeProfile } from '@thirty/shared';
 import { computeWindowStart } from '../../domains/diversity/services/rolling-window.service.js';
 import type { FoodLogRepository } from '../../domains/journal/repositories/food-log.repository.js';
 
+export type FoodLogMeta = {
+  readonly foodName: string;
+  readonly category: FoodCategory;
+  readonly isPlant: boolean;
+  readonly baseProfile: MicrobiomeProfile;
+};
+
 export class InMemoryFoodLogRepository implements FoodLogRepository {
+  constructor(private readonly resolveFood?: (foodId: string) => FoodLogMeta | undefined) {}
+
   private days = new Map<string, DayData>();
 
   async getDayData(userId: string, date: string): Promise<DayData> {
@@ -26,7 +35,7 @@ export class InMemoryFoodLogRepository implements FoodLogRepository {
 
   async addFoodLog(mealId: string, input: AddFoodLogInput): Promise<string> {
     const id = `log-${Date.now()}`;
-    // Find the day containing this meal and add the food log
+    const meta = this.resolveFood?.(input.foodId);
     for (const [key, day] of this.days) {
       for (const meal of day.meals) {
         if (meal.id === mealId) {
@@ -37,12 +46,12 @@ export class InMemoryFoodLogRepository implements FoodLogRepository {
               {
                 id,
                 foodId: input.foodId,
-                foodName: '',
-                category: 'OTHER' as const,
-                isPlant: false,
+                foodName: meta?.foodName ?? '',
+                category: meta?.category ?? 'OTHER',
+                isPlant: meta?.isPlant ?? false,
                 preparationMethod: input.preparationMethod,
                 portionSize: input.portionSize ?? null,
-                baseProfile: {
+                baseProfile: meta?.baseProfile ?? {
                   solubleFiberScore: 0,
                   insolubleFiberScore: 0,
                   prebioticScore: 0,

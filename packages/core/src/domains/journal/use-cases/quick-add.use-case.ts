@@ -1,4 +1,5 @@
 import type { QuickAddInput } from '@thirty/shared';
+import type { FoodRepository } from '../../food/repositories/food.repository.js';
 import type { DailyScoreRepository } from '../repositories/daily-score.repository.js';
 import type { FoodLogRepository } from '../repositories/food-log.repository.js';
 import type { MealRepository } from '../repositories/meal.repository.js';
@@ -9,6 +10,7 @@ export class QuickAddUseCase {
     private readonly mealRepo: MealRepository,
     private readonly foodLogRepo: FoodLogRepository,
     private readonly dailyScoreRepo: DailyScoreRepository,
+    private readonly foodRepo: FoodRepository,
   ) {}
 
   async execute(userId: string, input: QuickAddInput): Promise<string> {
@@ -22,9 +24,13 @@ export class QuickAddUseCase {
       meal = { id: mealId };
     }
 
-    // Add food log
+    const foodId =
+      'customFood' in input
+        ? await this.foodRepo.createUserFood(userId, input.customFood)
+        : input.foodId;
+
     const logId = await this.foodLogRepo.addFoodLog(meal.id, {
-      foodId: input.foodId,
+      foodId,
       preparationMethod: input.preparationMethod,
       ...(input.portionSize !== undefined && { portionSize: input.portionSize }),
     });

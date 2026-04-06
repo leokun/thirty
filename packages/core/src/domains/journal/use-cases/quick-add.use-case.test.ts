@@ -1,5 +1,7 @@
-import type { DayData, MicrobiomeProfile } from '@thirty/shared';
+import type { DayData, FoodCategory, FoodResponse, MicrobiomeProfile } from '@thirty/shared';
+import { PreparationMethod } from '@thirty/shared';
 import { beforeEach, describe, expect, it } from 'vitest';
+import { InMemoryFoodRepository } from '../../../infrastructure/food/in-memory-food.repository.js';
 import { InMemoryDailyScoreRepository } from '../../../infrastructure/journal/in-memory-daily-score.repository.js';
 import { InMemoryFoodLogRepository } from '../../../infrastructure/journal/in-memory-food-log.repository.js';
 import { InMemoryMealRepository } from '../../../infrastructure/journal/in-memory-meal.repository.js';
@@ -18,6 +20,26 @@ const baseProfile: MicrobiomeProfile = {
   omega3Score: 1,
   mucosalSupportScore: 1,
 };
+
+function stubFood(
+  id: string,
+  nameFr: string,
+  category: FoodCategory,
+  isPlant: boolean,
+): FoodResponse {
+  return {
+    id,
+    nameFr,
+    nameEn: nameFr,
+    category,
+    isPlant,
+    availablePreparations: [PreparationMethod.RAW, PreparationMethod.BOILED],
+    defaultPreparation: PreparationMethod.RAW,
+    baseProfile,
+    seasonMonths: [],
+    tags: [],
+  };
+}
 
 function makeDayWithMeal(mealId: string): DayData {
   return {
@@ -48,17 +70,30 @@ describe('QuickAddUseCase', () => {
   let mealRepo: InMemoryMealRepository;
   let foodLogRepo: InMemoryFoodLogRepository;
   let dailyScoreRepo: InMemoryDailyScoreRepository;
+  let foodRepo: InMemoryFoodRepository;
   let useCase: QuickAddUseCase;
 
   beforeEach(() => {
     mealRepo = new InMemoryMealRepository();
-    foodLogRepo = new InMemoryFoodLogRepository();
+    foodRepo = new InMemoryFoodRepository();
+    foodRepo.seedFood(stubFood('oats', 'Avoine', 'GRAIN', true));
+    foodRepo.seedFood(stubFood('carrot', 'Carotte', 'VEGETABLE', true));
+    foodRepo.seedFood(stubFood('salmon', 'Saumon', 'FISH', false));
+    foodLogRepo = new InMemoryFoodLogRepository((id) => {
+      const f = foodRepo.peek(id);
+      if (!f) return undefined;
+      return {
+        foodName: f.nameFr,
+        category: f.category,
+        isPlant: f.isPlant,
+        baseProfile: f.baseProfile,
+      };
+    });
     dailyScoreRepo = new InMemoryDailyScoreRepository();
-    useCase = new QuickAddUseCase(mealRepo, foodLogRepo, dailyScoreRepo);
+    useCase = new QuickAddUseCase(mealRepo, foodLogRepo, dailyScoreRepo, foodRepo);
   });
 
   it('creates a new meal when none exists for date+moment', async () => {
-    // Seed an empty day so foodLogRepo has the day data
     foodLogRepo.seed(USER_ID, [{ date: DATE, meals: [] }]);
 
     const logId = await useCase.execute(USER_ID, {
@@ -70,20 +105,17 @@ describe('QuickAddUseCase', () => {
 
     expect(logId).toBeDefined();
 
-    // Verify meal was created
     const meals = await mealRepo.getMealsByDate(USER_ID, DATE);
     expect(meals).toHaveLength(1);
     expect(meals[0]?.moment).toBe('BREAKFAST');
   });
 
   it('reuses existing meal for same date+moment', async () => {
-    // Pre-create a meal in the meal repo
     const existingMealId = await mealRepo.create(USER_ID, {
       date: DATE,
       moment: 'LUNCH',
     });
 
-    // Seed foodLogRepo with a day that has this meal
     foodLogRepo.seed(USER_ID, [makeDayWithMeal(existingMealId)]);
 
     const logId = await useCase.execute(USER_ID, {
@@ -95,7 +127,6 @@ describe('QuickAddUseCase', () => {
 
     expect(logId).toBeDefined();
 
-    // Verify no new meal was created (still 1)
     const meals = await mealRepo.getMealsByDate(USER_ID, DATE);
     expect(meals).toHaveLength(1);
     expect(meals[0]?.id).toBe(existingMealId);
@@ -115,5 +146,23 @@ describe('QuickAddUseCase', () => {
     expect(savedScore).not.toBeNull();
     expect(savedScore?.totalScore).toBeGreaterThanOrEqual(0);
     expect(savedScore?.totalScore).toBeLessThanOrEqual(100);
+  });
+
+  it('logs custom food via customFood payload', async () => {
+    const mealId = await mealRepo.create(USER_ID, { date: DATE, moment: 'LUNCH' });
+    foodLogRepo.seed(USER_ID, [
+      { date: DATE, meals: [{ id: mealId, moment: 'LUNCH', date: DATE, foodLogs: [] }] },
+    ]);
+
+    await useCase.execute(USER_ID, {
+      date: DATE,
+      moment: 'LUNCH',
+      customFood: { nameFr: 'Soupe maison', category: 'OTHER' },
+      preparationMethod: 'BOILED',
+    });
+
+    const day = await foodLogRepo.getDayData(USER_ID, DATE);
+    const logs = day.meals.flatMap((m) => m.foodLogs);
+    expect(logs.some((l) => l.foodName === 'Soupe maison')).toBe(true);
   });
 });

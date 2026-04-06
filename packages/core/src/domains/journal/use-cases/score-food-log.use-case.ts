@@ -5,6 +5,7 @@
 import type { FoodLogEntry, PreparationModifier, ScoredFoodLog } from '@thirty/shared';
 import { PREPARATION_DEFAULTS } from '../../scoring/constants/preparation-defaults.js';
 import { applyPreparationModifier } from '../../scoring/services/apply-preparation-modifier.service.js';
+import { applyPortionToAxisScores } from '../../scoring/services/portion-multiplier.service.js';
 
 /**
  * Scores a food log entry by resolving the appropriate modifier:
@@ -16,7 +17,8 @@ export function scoreFoodLog(entry: FoodLogEntry): ScoredFoodLog {
     ? { method: entry.preparationMethod, ...entry.customModifier }
     : { method: entry.preparationMethod, ...PREPARATION_DEFAULTS[entry.preparationMethod] };
 
-  const score = applyPreparationModifier(entry.baseProfile, modifier);
+  const rawScore = applyPreparationModifier(entry.baseProfile, modifier);
+  const score = applyPortionToAxisScores(rawScore, entry.portionSize);
 
   return {
     foodLogId: entry.id,
