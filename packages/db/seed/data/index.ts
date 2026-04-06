@@ -9,7 +9,9 @@ import { fruits } from './fruits.js';
 import { grains } from './grains.js';
 import { herbsSpices } from './herbs-spices.js';
 import { legumes } from './legumes.js';
+import { meat } from './meat.js';
 import { nutsSeeds } from './nuts-seeds.js';
+import { other } from './other.js';
 import { vegetables } from './vegetables.js';
 
 export const foods: FoodDefinition[] = [
@@ -25,4 +27,6 @@ export const foods: FoodDefinition[] = [
   ...eggs,
   ...fermentedCondiments,
   ...beverages,
+  ...meat,
+  ...other,
 ];
