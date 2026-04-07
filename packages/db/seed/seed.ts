@@ -187,7 +187,7 @@ async function seed() {
           polyphenolFactor: override?.polyphenolFactor ?? defaults.polyphenolFactor,
           probioticsFactor: override?.probioticsFactor ?? defaults.probioticsFactor,
           microbiomeBonus: override?.microbiomeBonus ?? defaults.microbiomeBonus,
-          overrideProfile: override?.overrideProfile ?? undefined,
+          ...(override?.overrideProfile != null && { overrideProfile: override.overrideProfile }),
         },
         update: {
           fiberFactor: override?.fiberFactor ?? defaults.fiberFactor,
@@ -195,7 +195,7 @@ async function seed() {
           polyphenolFactor: override?.polyphenolFactor ?? defaults.polyphenolFactor,
           probioticsFactor: override?.probioticsFactor ?? defaults.probioticsFactor,
           microbiomeBonus: override?.microbiomeBonus ?? defaults.microbiomeBonus,
-          overrideProfile: override?.overrideProfile ?? undefined,
+          ...(override?.overrideProfile != null && { overrideProfile: override.overrideProfile }),
         },
       });
       modifierCount++;

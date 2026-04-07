@@ -13,6 +13,7 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "@prisma/client": "^7.6.0",
     "@thirty/config-biome": "workspace:*",
     "@thirty/config-typescript": "workspace:*",
     "prisma": "^7.6.0",

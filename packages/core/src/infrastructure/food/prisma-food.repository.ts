@@ -183,7 +183,7 @@ export class PrismaFoodRepository implements FoodRepository {
       _max: { createdAt: true },
       orderBy: { _max: { createdAt: 'desc' } },
       take: limit,
-    })) as GroupRow[];
+    })) as unknown as GroupRow[];
 
     if (result.length === 0) return [];
 

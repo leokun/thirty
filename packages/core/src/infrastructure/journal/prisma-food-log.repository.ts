@@ -1,4 +1,4 @@
-import { prisma } from '@thirty/db';
+import { type Prisma, prisma } from '@thirty/db';
 import type {
   AddFoodLogInput,
   DayData,
@@ -172,7 +172,7 @@ export class PrismaFoodLogRepository implements FoodLogRepository {
         foodId: input.foodId,
         preparationMethod: input.preparationMethod,
         portionSize: input.portionSize ?? null,
-        computedScore: computedScore as unknown as Record<string, unknown>,
+        computedScore: computedScore as unknown as Prisma.InputJsonValue,
       },
     });
 
