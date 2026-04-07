@@ -17,6 +17,7 @@
     "@thirty/config-biome": "workspace:*",
     "@thirty/config-typescript": "workspace:*",
     "prisma": "^7.6.0",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   },
   "scripts": {
