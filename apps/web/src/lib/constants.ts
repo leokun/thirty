@@ -12,6 +12,7 @@ export const queryKeys = {
   scores: {
     daily: (date: string) => ['scores', 'daily', date] as const,
     weeklyDiversity: (date: string) => ['scores', 'weekly-diversity', date] as const,
+    history: (date: string, days: number) => ['scores', 'history', date, days] as const,
   },
   favorites: {
     list: () => ['favorites'] as const,

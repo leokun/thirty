@@ -1,5 +1,5 @@
 import { useDayJournal } from '../../api/journal.js';
-import { useDailyScore } from '../../api/scores.js';
+import { useDailyScore, useScoreHistory, useWeeklyDiversity } from '../../api/scores.js';
 import { formatDateFr } from '../../lib/date.js';
 import { MealCard } from './meal-card.js';
 import { PlantCounter } from './plant-counter.js';
@@ -14,6 +14,8 @@ const MOMENT_ORDER = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'] as const;
 export function DayView({ date }: DayViewProps) {
   const { data: day, isLoading, error } = useDayJournal(date);
   const { data: scoreData } = useDailyScore(date);
+  const { data: diversityData } = useWeeklyDiversity(date);
+  const { data: historyData } = useScoreHistory(date);
 
   if (isLoading) {
     return (
@@ -40,9 +42,14 @@ export function DayView({ date }: DayViewProps) {
     <div className="space-y-4 p-4">
       <h2 className="text-base font-semibold capitalize">{formatDateFr(date)}</h2>
 
-      {score && <ScoreSummary score={score} />}
+      {score && <ScoreSummary score={score} history={historyData} />}
 
-      {score && <PlantCounter count={score.rollingPlantCount} />}
+      {score && (
+        <PlantCounter
+          count={diversityData?.rollingPlantCount ?? score.rollingPlantCount}
+          plantsByDay={diversityData?.plantsByDay}
+        />
+      )}
 
       {sortedMeals.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">Aucun repas enregistre</p>
