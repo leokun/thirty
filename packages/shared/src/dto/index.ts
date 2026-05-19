@@ -20,5 +20,7 @@ export type {
 } from './journal.dto.js';
 export type {
   DailyScoreResponse,
+  ScoreHistoryEntry,
+  ScoreHistoryResponse,
   WeeklyDiversityResponse,
 } from './score.dto.js';

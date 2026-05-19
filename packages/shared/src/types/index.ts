@@ -1,4 +1,5 @@
 export type {
+  PlantDayEntry,
   RollingWindowData,
   WeeklyDiversityResult,
 } from './diversity.js';

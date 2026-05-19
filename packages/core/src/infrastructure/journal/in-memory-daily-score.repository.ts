@@ -1,5 +1,8 @@
 import type { DailyScoreBreakdown } from '@thirty/shared';
-import type { DailyScoreRepository } from '../../domains/journal/repositories/daily-score.repository.js';
+import type {
+  DailyScoreRepository,
+  DatedDailyScore,
+} from '../../domains/journal/repositories/daily-score.repository.js';
 
 export class InMemoryDailyScoreRepository implements DailyScoreRepository {
   private scores = new Map<string, DailyScoreBreakdown>();
@@ -26,6 +29,18 @@ export class InMemoryDailyScoreRepository implements DailyScoreRepository {
     }
 
     return latest?.score ?? null;
+  }
+
+  async getRange(userId: string, startDate: string, endDate: string): Promise<DatedDailyScore[]> {
+    const result: DatedDailyScore[] = [];
+    for (const [key, breakdown] of this.scores) {
+      if (!key.startsWith(`${userId}:`)) continue;
+      const date = key.slice(userId.length + 1);
+      if (date >= startDate && date <= endDate) {
+        result.push({ date, breakdown });
+      }
+    }
+    return result.sort((a, b) => a.date.localeCompare(b.date));
   }
 
   seed(userId: string, date: string, breakdown: DailyScoreBreakdown): void {

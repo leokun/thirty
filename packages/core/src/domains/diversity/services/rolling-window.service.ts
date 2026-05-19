@@ -2,7 +2,12 @@
 // Rolling window - sliding window D-6 to D (ADR-004)
 // =============================================================================
 
-import { type FoodLogEntry, ROLLING_WINDOW_DAYS, type RollingWindowData } from '@thirty/shared';
+import {
+  type FoodLogEntry,
+  type PlantDayEntry,
+  ROLLING_WINDOW_DAYS,
+  type RollingWindowData,
+} from '@thirty/shared';
 
 /**
  * Computes the start date of the rolling window (D-6).
@@ -70,4 +75,26 @@ export function uniqueFoodIds(
     }
   }
   return [...ids];
+}
+
+/**
+ * Extracts unique plants from the rolling window with the first date each was seen.
+ * Days are expected to be in chronological order (D-6 to D).
+ */
+export function extractPlantsByDay(data: RollingWindowData): readonly PlantDayEntry[] {
+  const seen = new Map<string, PlantDayEntry>();
+  for (const day of data.days) {
+    for (const meal of day.meals) {
+      for (const entry of meal.foodLogs) {
+        if (entry.isPlant && !seen.has(entry.foodId)) {
+          seen.set(entry.foodId, {
+            foodId: entry.foodId,
+            foodName: entry.foodName,
+            firstSeenDate: day.date,
+          });
+        }
+      }
+    }
+  }
+  return [...seen.values()].sort((a, b) => a.firstSeenDate.localeCompare(b.firstSeenDate));
 }

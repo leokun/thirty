@@ -1,6 +1,9 @@
 import { prisma } from '@thirty/db';
 import type { DailyScoreBreakdown } from '@thirty/shared';
-import type { DailyScoreRepository } from '../../domains/journal/repositories/daily-score.repository.js';
+import type {
+  DailyScoreRepository,
+  DatedDailyScore,
+} from '../../domains/journal/repositories/daily-score.repository.js';
 
 export class PrismaDailyScoreRepository implements DailyScoreRepository {
   async save(userId: string, date: string, breakdown: DailyScoreBreakdown): Promise<void> {
@@ -80,5 +83,34 @@ export class PrismaDailyScoreRepository implements DailyScoreRepository {
     });
 
     return score?.totalScore ?? null;
+  }
+
+  async getRange(userId: string, startDate: string, endDate: string): Promise<DatedDailyScore[]> {
+    const scores = await prisma.dailyScore.findMany({
+      where: {
+        userProfile: { userId },
+        date: {
+          gte: new Date(startDate),
+          lte: new Date(endDate),
+        },
+      },
+      orderBy: { date: 'asc' },
+    });
+
+    return scores.map((score) => ({
+      date: score.date.toISOString().slice(0, 10),
+      breakdown: {
+        totalScore: score.totalScore,
+        diversityScore: score.diversityScore,
+        fiberPrebioticScore: score.fiberPrebioticScore,
+        fermentedScore: score.fermentedScore,
+        polyphenolScore: score.polyphenolScore,
+        mucosalSupportScore: score.mucosalSupportScore,
+        preparationScore: score.preparationScore,
+        rollingPlantCount: score.rollingPlantCount,
+        rollingTotalFoodCount: score.rollingTotalFoodCount,
+        trend: score.trend,
+      },
+    }));
   }
 }

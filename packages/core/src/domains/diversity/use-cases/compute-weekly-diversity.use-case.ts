@@ -6,6 +6,7 @@ import type { RollingWindowData, WeeklyDiversityResult } from '@thirty/shared';
 import { computeTrend } from '../../shared/services/compute-trend.service.js';
 import {
   countDistinct,
+  extractPlantsByDay,
   flattenFoodLogs,
   uniqueFoodIds,
 } from '../services/rolling-window.service.js';
@@ -24,12 +25,14 @@ export function computeWeeklyDiversity(
   const uniquePlantNames = [...new Set(plantLogs.map((e) => e.foodName))];
   const rollingTotalFoodCount = countDistinct(currentWindow, () => true);
   const rollingPlantCount = plantIds.length;
+  const plantsByDay = extractPlantsByDay(currentWindow);
 
   return {
     rollingPlantCount,
     rollingTotalFoodCount,
     uniquePlantIds: plantIds,
     uniquePlantNames,
+    plantsByDay,
     trend: computeTrend(rollingPlantCount, previousPlantCount, 3),
   };
 }
